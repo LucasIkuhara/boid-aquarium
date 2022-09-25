@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html class="fill">
+
+    <head>
+        <meta charset=utf-8>
+        <script src="https://unpkg.com/vue@3"></script>
+        <script src="https://unpkg.com/vue-router@4"></script>
+        <script language="javascript" src="https://npmcdn.com/regl/dist/regl.js"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    
+    <body class="fill">
+        <!-- Vue App -->
+        <div id="vue-app" class="fill">
+            
+            <!-- Mount for REGL viewport -->
+            <canvas id="webgl-canvas" v-bind:height="canvasHeight" v-bind:width="canvasWidth" class="fill"></canvas>
+
+        </div>
+        
+    </body>
+    <script src="main.js" type="module"></script>
+
+</html>
