@@ -1,4 +1,5 @@
 import { Painter } from './painter.js'
+import { BoidTank } from './tank.js'
 
 
 Vue.createApp({
@@ -17,8 +18,11 @@ Vue.createApp({
 
         // Setup REGL
         const painter = new Painter('webgl-canvas')
-        painter.paint()
+        const tank = new BoidTank(painter);
 
+        // Iterate tank
+        setInterval(() => {tank.simStep();}, 100)
+ 
     },
 
     methods: {
