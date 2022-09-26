@@ -88,7 +88,7 @@ export class Painter {
             uniforms: {
               resolution: [this.resX, this.resY],
               intensity: 1,
-              start: [boid.position[0], boid.position[1]],
+              start: [(this.resY/2) + boid.position[0], (this.resX/2) + boid.position[1]],
               end: [20, 300],
               color: [1.0, 1.0, 1.0, 1.0]
             }

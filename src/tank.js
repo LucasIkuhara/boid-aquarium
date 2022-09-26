@@ -51,24 +51,29 @@ class BoidActor extends PaintableBoid {
     constructor(tankSize, isIn2dSpace=false) {
         super()
 
+        if (!tankSize) tankSize = [100, 100 , 100];
+
         // Generate Boid ID
         BoidActor.boidCount++;
         this._id = BoidActor.boidCount;
-        this.speed = 1;
+        this.speed = 4;
+        this.tankSize = tankSize;
 
         this.position = [
-            tankSize[0]*Math.random(), 
-            tankSize[1]*Math.random(), 
-            isIn2dSpace ? 0 : tankSize[2]*Math.random()
+            random(tankSize[0]), 
+            random(tankSize[1]), 
+            isIn2dSpace ? 0 : random(tankSize[2])
         ]
 
         this.heading = [
-            Math.random(), 
-            Math.random(), 
-            isIn2dSpace ? 0 : Math.random()
+            random(0.5), 
+            random(0.5), 
+            isIn2dSpace ? 0 : random(0.5)
         ]
 
     }
+
+    
 
     /**
      * Computes the next step in the boid simulation. Updates the object's position and heading.
@@ -83,10 +88,25 @@ class BoidActor extends PaintableBoid {
      * @returns The new position as a number[] of size 3.
      */
     computePosition() {
-        return [
+        let pos = [
             this.position[0] + this.heading[0]*this.speed,
             this.position[1] + this.heading[1]*this.speed,
             this.position[2] + this.heading[2]*this.speed
         ]
+
+        pos.forEach((val, index) => {
+            pos[index] = Math.abs(val) > this.tankSize[index] ? -val : val;
+        });
+
+        return pos;
     }
+}
+
+/**
+ * Generates a random number, either positive or negative in the scale given [scale, scale]
+ * @param {number} scale 
+ * @returns A random number.
+ */
+function random(scale) {
+    return ((Math.random()*2)-1)*scale;
 }
