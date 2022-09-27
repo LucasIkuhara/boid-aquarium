@@ -6,18 +6,18 @@ export class BoidTank {
     /**
      * 
      * @param {Painter} painter 
-     * @param {number} n 
-     * @
+     * @param {EnvConfig} env
+     *
      */
-    constructor(painter, n=10, tankSize=[10, 10, 10]) {
+    constructor(painter, env) {
 
+        this.env = env;
         this.painter = painter;
         this.frame = 0;
-        this.tankSize = tankSize;
 
         this.boids = []
-        for (let i=0; i<n; i++) {
-            this.boids.push(new BoidActor(tankSize))
+        for (let i=0; i<env.boidCountTarget; i++) {
+            this.boids.push(new BoidActor(env))
         }
     }
 
@@ -44,36 +44,59 @@ export class BoidTank {
     }
 }
 
+
+/**
+ * Represents the settings of the environment in which the boids are placed in.
+ */
+class EnvConfig {
+    /** Depicts the dimensions of the environment as number[] of length 3. */
+    tankSize = [100, 100, 100];
+
+    /** The size of simulation steps in seconds (ex: 0.2s per step), */
+    timeStepInSecs = 1;
+
+    /** The desired amount of boids in the tank. */
+    boidCountTarget = 10;
+
+    /** Indicates wether or not the boids should be simulated in 2D. */
+    is2dSpace = true;
+}
+
+
 class BoidActor extends PaintableBoid {
 
     static boidCount = 0;
 
-    constructor(tankSize, isIn2dSpace=false) {
+    /**
+     * Creates a new BoidActor.
+     * @constructor
+     * @param {EnvConfig} environment 
+     */
+    constructor(environment) {
         super()
 
-        if (!tankSize) tankSize = [100, 100 , 100];
+        this.env = environment;
+        console.log(environment)
 
         // Generate Boid ID
         BoidActor.boidCount++;
         this._id = BoidActor.boidCount;
-        this.speed = 4;
-        this.tankSize = tankSize;
+        this.speed = 40;
+        this.tankSize = this.env.tankSize;
 
         this.position = [
-            random(tankSize[0]), 
-            random(tankSize[1]), 
-            isIn2dSpace ? 0 : random(tankSize[2])
+            random(this.env.tankSize[0]), 
+            random(this.env.tankSize[1]), 
+            this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
         ]
 
         this.heading = [
             random(0.5), 
             random(0.5), 
-            isIn2dSpace ? 0 : random(0.5)
+            this.env.is2dSpace ? 0 : random(0.5)
         ]
 
     }
-
-    
 
     /**
      * Computes the next step in the boid simulation. Updates the object's position and heading.
@@ -84,14 +107,16 @@ class BoidActor extends PaintableBoid {
 
     /**
      * Computes the new boid position based on its current position, heading and speed.
-     * 
      * @returns The new position as a number[] of size 3.
      */
     computePosition() {
+
+        const moveBy = this.speed * this.env.timeStepInSecs;
+
         let pos = [
-            this.position[0] + this.heading[0]*this.speed,
-            this.position[1] + this.heading[1]*this.speed,
-            this.position[2] + this.heading[2]*this.speed
+            this.position[0] + this.heading[0]*moveBy,
+            this.position[1] + this.heading[1]*moveBy,
+            this.position[2] + this.heading[2]*moveBy
         ]
 
         pos.forEach((val, index) => {

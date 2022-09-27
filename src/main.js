@@ -15,13 +15,19 @@ Vue.createApp({
 
     mounted() {
         console.log('Vue app mounted successfully!')
+        const fpsTarget = 60;
 
         // Setup REGL
         const painter = new Painter('webgl-canvas')
-        const tank = new BoidTank(painter, 15, [400, 300, 0]);
+        const tank = new BoidTank(painter, {
+            boidCountTarget: 15,
+            is2dSpace: false,
+            tankSize: [500, 300, 0],
+            timeStepInSecs: 1/fpsTarget
+        });
 
         // Iterate tank
-        setInterval(() => {tank.simStep();}, 100)
+        setInterval(() => {tank.simStep();}, 1000/fpsTarget)
  
     },
 
