@@ -4,16 +4,18 @@ import { PaintableBoid, Painter } from "./painter.js"
 export class BoidTank {
 
     /**
-     * 
-     * @param {Painter} painter 
-     * @param {EnvConfig} env
-     *
+     * Creates a new BoidTank.
+     * @constructor
+     * @param {Painter} painter A Painter object.
+     * @param {EnvConfig} env The tank environment settings.
+     * @param {boolean} debug Enable debugging logs.
      */
-    constructor(painter, env) {
+    constructor(painter, env, debug=false) {
 
         this.env = env;
         this.painter = painter;
         this.frame = 0;
+        this.debug = debug;
 
         this.boids = []
         for (let i=0; i<env.boidCountTarget; i++) {
@@ -37,8 +39,11 @@ export class BoidTank {
      * Advance time in the tank simulation.
      */
     simStep() {
-        this.frame++;
-        console.log("[FRAME]:", this.frame)
+
+        if (this.debug) {
+            this.frame++;
+            console.log("[FRAME]:", this.frame)
+        }
         this.triggerAll();
         this.paintAll()
     }
@@ -60,6 +65,9 @@ class EnvConfig {
 
     /** Indicates wether or not the boids should be simulated in 2D. */
     is2dSpace = true;
+
+    /** The nominal boid moving speed per second. */
+    boidSpeed = 40;
 }
 
 
@@ -70,19 +78,16 @@ class BoidActor extends PaintableBoid {
     /**
      * Creates a new BoidActor.
      * @constructor
-     * @param {EnvConfig} environment 
+     * @param {EnvConfig} environment The settings of the environment the boid is in.
      */
     constructor(environment) {
-        super()
-
+        
+        super();
         this.env = environment;
-        console.log(environment)
 
         // Generate Boid ID
         BoidActor.boidCount++;
         this._id = BoidActor.boidCount;
-        this.speed = 40;
-        this.tankSize = this.env.tankSize;
 
         this.position = [
             random(this.env.tankSize[0]), 
@@ -111,7 +116,7 @@ class BoidActor extends PaintableBoid {
      */
     computePosition() {
 
-        const moveBy = this.speed * this.env.timeStepInSecs;
+        const moveBy = this.env.boidSpeed * this.env.timeStepInSecs;
 
         let pos = [
             this.position[0] + this.heading[0]*moveBy,
@@ -120,7 +125,7 @@ class BoidActor extends PaintableBoid {
         ]
 
         pos.forEach((val, index) => {
-            pos[index] = Math.abs(val) > this.tankSize[index] ? -val : val;
+            pos[index] = Math.abs(val) > this.env.tankSize[index] ? -val : val;
         });
 
         return pos;

@@ -38,7 +38,7 @@ export class Painter {
           vec2 position = resolution.yx / 2.0 + start.xy;
 
           // 5%
-          float distThresholdInPixels = ((resolution[0] + resolution[1]) / 2.0) * 0.01;
+          float distThresholdInPixels = ((resolution[0] + resolution[1]) / 2.0) * 0.006;
 
           if (distance(position, gl_FragCoord.xy) > distThresholdInPixels) {
             discard;

@@ -23,7 +23,8 @@ Vue.createApp({
             boidCountTarget: 15,
             is2dSpace: false,
             tankSize: [500, 300, 0],
-            timeStepInSecs: 1/fpsTarget
+            timeStepInSecs: 1/fpsTarget,
+            boidSpeed: 40
         });
 
         // Iterate tank
