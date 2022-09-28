@@ -114,10 +114,7 @@ export class Painter {
 /**
  * A PaintableBoid is an object that can be drawn by a Painter.
  * 
+ * @typedef {Object} PaintableBoid
  * @property {number[]} position The current boid position.
  * @property {number[]} heading The unitary vector corresponding to the moving direction.
  */
-export class PaintableBoid {
-  position = [0, 0]
-  heading = [0, 0]
-}
