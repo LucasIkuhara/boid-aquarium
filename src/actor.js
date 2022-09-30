@@ -1,6 +1,11 @@
+const vec3 = glMatrix.vec3;
+
+
 export class BoidActor {
 
+    // Keep state of all boids accessible
     static boidCount = 0;
+    static peers = [];
 
     /**
      * Creates a new BoidActor.
@@ -11,15 +16,19 @@ export class BoidActor {
         
         this.env = environment;
 
-        // Generate Boid ID
+        // Generate Boid ID and add to peers
         BoidActor.boidCount++;
         this._id = BoidActor.boidCount;
+        BoidActor.peers.push(this);
 
+        // ! refactor
         this.position = [
             random(this.env.tankSize[0]), 
             random(this.env.tankSize[1]), 
             this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
         ]
+
+        this.viewingRange = 50;
 
         this.heading = [
             random(0.5), 
@@ -33,6 +42,7 @@ export class BoidActor {
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
     act() {
+        this.heading = this.computeHeading()
         this.position = this.computePosition()
     }
 
@@ -55,6 +65,41 @@ export class BoidActor {
         });
 
         return pos;
+    }
+
+    /**
+     * Computes a new heading based on its peers.
+     * @returns {number[]} The new heading for that boid.
+     */
+    computeHeading() {
+
+        const visiblePeers = this.getVisiblePeers();
+        if (visiblePeers.length < 1) return this.heading;
+        
+        const avg = visiblePeers.reduce(
+            (prev, curr) => { 
+                return {
+                position: vec3.add([], prev.position, curr.position),
+                heading: vec3.add([], prev.heading, curr.heading)
+            }},
+        {position: [0,0,0], heading: [0,0,0]})
+        
+        const newHeading = vec3.lerp([], this.heading, avg.heading, 0.5);
+        return vec3.normalize([], newHeading)
+    } 
+
+    /**
+     * Returns the list of boids that are in visible range of the actor, excluding itself.
+     * @returns {BoidActor[]} An array of boids in range.
+     */
+    getVisiblePeers() {
+        return BoidActor.peers.filter(boid => {
+            
+            // Exclude itself
+            if (boid._id === this._id) return false;
+            
+            return vec3.distance(this.position, boid.position) < this.viewingRange;
+        })
     }
 }
 
