@@ -1,3 +1,7 @@
+import frag from './shaders/boid_frag.js'
+import vert from './shaders/boid_vert.js'
+
+
 /**
  * Responsible for interacting with the canvas element to draw objects on it.
  */
@@ -25,36 +29,8 @@ export class Painter {
      */
     compileBoidShader() {
       return this.canvas({
-        frag: `
-        precision mediump float;
-        uniform vec4 color;
-        uniform vec3 start;
-        uniform vec2 end;
-        uniform vec2 resolution;
-        
-        void main () {
-
-          // Compute position
-          vec2 position = resolution.yx / 2.0 + start.xy;
-
-          // 5%
-          float distThresholdInPixels = ((resolution[0] + resolution[1]) / 2.0) * 0.006;
-
-          if (distance(position, gl_FragCoord.xy) > distThresholdInPixels) {
-            discard;
-          }
-
-          gl_FragColor = vec4(position, 0.0, 1.0);
-        
-        } // End main
-        `,
-    
-        vert: `
-        attribute vec2 position;
-        void main () {
-          gl_Position = vec4(position, 0., 1.);
-        }`,
-    
+        frag: frag,
+        vert: vert,
         attributes: {
           position: [
             [-1, -1],
@@ -63,13 +39,10 @@ export class Painter {
             [-1, 1]
           ]
         },
-    
         depth: {
           enable: false
         },
-    
         primitive: "triangle fan",
-    
         blend: {
           enable: false,
           func: {
