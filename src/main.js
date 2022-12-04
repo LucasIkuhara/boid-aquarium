@@ -20,11 +20,11 @@ Vue.createApp({
         // Setup REGL
         const painter = new Painter('webgl-canvas')
         const tank = new BoidTank(painter, {
-            boidCountTarget: 15,
+            boidCountTarget: 35,
             is2dSpace: false,
-            tankSize: [500, 300, 0],
+            tankSize: [10, 10, 5],
             timeStepInSecs: 1/fpsTarget,
-            boidSpeed: 40
+            boidSpeed: 5
         });
 
         // Iterate tank
