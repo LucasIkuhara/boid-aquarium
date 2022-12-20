@@ -4,7 +4,7 @@
  */
 export class CameraController {
 
-    constructor(radialSensitivity = 0.01, tangentSensitivity = 0.01 ) {
+    constructor(radialSensitivity = 0.01, tangentSensitivity = 0.1 ) {
 
         this.angle = 0;
         this.radius = 50;
@@ -26,8 +26,8 @@ export class CameraController {
             
             // On move
             document.onmousemove = event => {
-                this.angle = this.angle + (event.x - this.clickPos.x)*this.tSense;
-                // this.radius = this.radius + (event.y - this.clickPos.y)*this.rSense;
+                this.angle = this.angle + -1*(event.x - this.clickPos.x)*this.tSense;
+                this.radius = this.radius + (event.y - this.clickPos.y)*this.rSense;
                 this.clickPos = {x: event.x, y: event.y};
             }
         }
@@ -44,31 +44,30 @@ export class CameraController {
      * @returns {number[]} A perspective matrix.
      */
     get perspectiveMatrix() {
-        return glMatrix.mat4.perspective(
-            [],
-            window.innerHeight,
-            window.innerWidth/window.innerHeight,
-            0.001,
-            null
+        return glMatrix.mat4.perspective([],
+            window.innerHeight, // Vertical resolution
+            window.innerWidth/window.innerHeight, // Aspect-ratio
+            0.001, // Min dist
+            null // Max dist
         );
     }
 
     /**
-     * Generates the view matrix of the camera, depending on the camera postion and orientation.
+     * Generates the view matrix of the camera, depending on the camera position and orientation.
      * @returns {number[]} A view matrix.
      */
     get viewMatrix() {
 
-        // console.log(this.angle)
-        return glMatrix.mat4.invert(
-            [],
-            glMatrix.mat4.fromRotationTranslationScale(
-                [], 
-                glMatrix.quat.fromEuler([], ...[0, -this.angle, 0]),
-                // [1, 1, 100],
-                [this.radius*Math.sin(this.angle), 1, this.radius*Math.cos(this.angle)], 
+        const angleInRad = this.angle*Math.PI/180;
 
-                [1, 1, 1]
+        // ViewMatrix = CameraModelMatrix^(-1)
+        return glMatrix.mat4.invert([],
+
+            // compute CameraModelMatrix
+            glMatrix.mat4.fromRotationTranslationScale([], 
+                glMatrix.quat.fromEuler([], ...[0, this.angle, 0]), // Look at the center
+                [this.radius*Math.sin(angleInRad), 0, this.radius*Math.cos(angleInRad)], // Orbit the object using polar coordinates
+                [1, 1, 1] // No scaling
             )
         );
     }
