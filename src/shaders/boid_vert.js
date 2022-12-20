@@ -8,7 +8,9 @@ export default `
   uniform mat4 perspectiveMatrix;
   
   void main () {
-    gl_Position = perspectiveMatrix*viewMatrix*modelMatrix*vec4(position, 1.0);
-    vertex_normal = normal; //(modelview*vec4(normal,1.0)).xyz;
+
+    mat4 modelView = viewMatrix*modelMatrix;
+    gl_Position = perspectiveMatrix*modelView*vec4(position, 1.0);
+    vertex_normal = (modelView*vec4(normal, 0.0)).xyz;
   }
 `
