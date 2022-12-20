@@ -4,7 +4,6 @@ import vert from './shaders/boid_vert.js'
 import model from './boid_model.js'
 
 
-
 /**
  * Responsible for interacting with the canvas element to draw objects on it.
  */
@@ -14,13 +13,17 @@ export class Painter {
      * Generates a new Painter. 
      * @constructor
      * @param {string} canvasElementId The element id of a canvas element.
+     * @param {CameraObject} camera The camera through which the scene is viewed.
      */
-    constructor(canvasElementId) {
+    constructor(canvasElementId, camera) {
 
         // Setup REGL
         const elem = document.getElementById(canvasElementId);
         this.canvas = createREGL(elem);
         this.resolution = [elem.height, elem.width]
+
+        // Register camera
+        this.camera = camera;
 
         // Compile shaders
         this.boidShader = this.compileBoidShader();
@@ -48,9 +51,8 @@ export class Painter {
         uniforms: {
           resolution: this.resolution,
           intensity: 1,
-          start: this.canvas.prop('position'),
-          end: [20, 300],
-          color: [1.0, 1.0, 1.0, 1.0],
+          objColor: [0.5, 0.7, 1.0],
+          emission: 0.0,
           viewMatrix: this.canvas.prop('viewMatrix'),
           modelMatrix: this.canvas.prop('modelMatrix'),
           perspectiveMatrix: this.canvas.prop('perspectiveMatrix'),
@@ -73,7 +75,10 @@ export class Painter {
      * @param {PaintableBoid} boid A boid to be painted on to the canvas.
      */
     paintBoid(boid) {
-      this.boidShader(actorToPaintable(boid));
+      this.boidShader({
+        perspectiveMatrix: this.camera.perspectiveMatrix,
+        viewMatrix: this.camera.viewMatrix,
+        modelMatrix: actorToModel(boid)});
     }
 }
 
@@ -89,32 +94,32 @@ export class Painter {
  * @property {number[]} heading The unitary vector corresponding to the moving direction.
  */
 
+/**
+ * A CameraObject is an object representing a camera in the scene.
+ * 
+ * @typedef {Object} CameraObject
+ * @property {number[]} viewMatrix The view matrix, regarding the position and heading of a camera.
+ * @property {number[]} perspectiveMatrix The perspective matrix of the camera.
+ */
 
 
 /**
+ * Creates a model matrix from the postion, orientation and scale of a boid.
  * @param {BoidActor} actor The boid actor to be painted.
+ * @returns {number[]} A model matrix.
  */
-function actorToPaintable(actor) {
+function actorToModel(actor) {
   
-  const scale= 0.5;
-  const a = {
-    perspectiveMatrix: glMatrix.mat4.perspective([], 480, 16/9, 0.001, 10000),
-    modelMatrix: glMatrix.mat4.fromRotationTranslationScale(
-      [], 
-      glMatrix.quat.fromEuler([], 
-        Math.acos(actor.heading[0])*(180/Math.PI),
-        Math.acos(actor.heading[1])*(180/Math.PI),
-        Math.acos(actor.heading[2])*(180/Math.PI)
-      ),
-      actor.position, 
-      [scale,scale,scale]
+  const scale = 0.2;
+  return glMatrix.mat4.fromRotationTranslationScale(
+    [], 
+    glMatrix.quat.fromEuler([], 
+      Math.acos(actor.heading[0])*(180/Math.PI),
+      Math.acos(actor.heading[1])*(180/Math.PI),
+      Math.acos(actor.heading[2])*(180/Math.PI)
     ),
-    viewMatrix: glMatrix.mat4.invert([], glMatrix.mat4.fromRotationTranslationScale([], glMatrix.quat.fromEuler([], ...[0,0,0]), [0, -3, 1.5], [1,1,1])),
-    position: actor.position
-  }
-
-
-  return a
-
+    actor.position, 
+    [scale,scale,scale]
+  );
 }
 
