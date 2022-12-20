@@ -1,24 +1,27 @@
 export default `
 
-precision mediump float;
-uniform vec4 color;
-uniform vec3 start;
-uniform vec2 end;
-uniform vec2 resolution;
+ precision mediump float;
+  varying vec3 vertex_normal;
+  uniform vec3 objColor;
+  uniform float emission;
 
-void main () {
-
-    // Compute position
-    vec2 position = resolution.yx / 2.0 + start.xy;
-
-    // 5%
-    float distThresholdInPixels = ((resolution[0] + resolution[1]) / 2.0) * 0.006;
-
-    if (distance(position, gl_FragCoord.xy) > distThresholdInPixels) {
-    discard;
-    }
-
-    gl_FragColor = vec4(position, 0.0, 1.0);
-
-}
+  void main () {
+    
+    // Scene Params
+    vec3 lightDir = normalize(vec3(0.5, 0.4, -0.5));
+    vec3 lightColor = vec3(0.2, 0.2, 0.2);
+    float ambient = 0.6;
+    
+    // Object Params
+    float diffuse = 1.0;
+    float specular = 1.0;
+    float shininess = 1.0;
+    
+    vec3 normal = normalize(vertex_normal);
+    float diffuseComp = max(0.0,diffuse * dot(normal,lightDir));
+    vec3 ref = 2.0*dot(lightDir,normal)*normal - lightDir;
+    float specularComp = specular*pow(max(0.0,dot(ref,vec3(0.0,0.0,1.0))),shininess);
+    gl_FragColor = vec4((ambient+diffuseComp)*lightColor*objColor +
+                        specularComp*lightColor, 1.0);
+  }
 `

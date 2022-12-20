@@ -1,5 +1,7 @@
 import { Painter } from './painter.js'
 import { BoidTank } from './tank.js'
+import { CameraController } from './camera.js'
+
 
 
 Vue.createApp({
@@ -17,14 +19,15 @@ Vue.createApp({
         console.log('Vue app mounted successfully!')
         const fpsTarget = 60;
 
-        // Setup REGL
-        const painter = new Painter('webgl-canvas')
+        // Setup REGL and scene
+        const camController = new CameraController();
+        const painter = new Painter('webgl-canvas', camController);
         const tank = new BoidTank(painter, {
-            boidCountTarget: 15,
+            boidCountTarget: 1000,
             is2dSpace: false,
-            tankSize: [500, 300, 0],
+            tankSize: [10, 10, 10],
             timeStepInSecs: 1/fpsTarget,
-            boidSpeed: 40
+            boidSpeed: 4.0
         });
 
         // Iterate tank

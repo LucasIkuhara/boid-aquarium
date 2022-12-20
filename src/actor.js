@@ -28,7 +28,7 @@ export class BoidActor {
             this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
         ]
 
-        this.viewingRange = 50;
+        this.viewingRange = 0.5;
 
         this.heading = [
             random(0.5), 
@@ -110,4 +110,5 @@ export class BoidActor {
  */
  function random(scale) {
     return ((Math.random()*2)-1)*scale;
+    
 }
