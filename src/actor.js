@@ -60,8 +60,10 @@ export class BoidActor {
             this.position[2] + this.heading[2]*moveBy
         ]
 
+        // Make the boids bounce back, in case they are escaping the tank
         pos.forEach((val, index) => {
-            pos[index] = Math.abs(val) > this.env.tankSize[index] ? -val : val;
+            if (Math.abs(val) > this.env.tankSize[index]) 
+                this.heading[index] = -this.heading[index];
         });
 
         return pos;
@@ -69,6 +71,7 @@ export class BoidActor {
 
     /**
      * Computes a new heading based on its peers.
+     * This is the core of boid grouping behavior.
      * @returns {number[]} The new heading for that boid.
      */
     computeHeading() {
