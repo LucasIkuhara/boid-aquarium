@@ -61,4 +61,6 @@ export class BoidTank {
  * @property {number} timeStepInSecs The size of simulation steps in seconds (ex: 0.2s per step).
  * @property {number} boidCountTarget The desired amount of boids in the tank.
  * @property {boolean} is2dSpace Indicates wether or not the boids should be simulated in 2D.
+ * @typedef {import('./actor').BoidCfg} BoidCfg
  */
+
