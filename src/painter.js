@@ -104,22 +104,27 @@ export class Painter {
 
 
 /**
- * Creates a model matrix from the postion, orientation and scale of a boid.
+ * Creates a model matrix from the position, orientation and scale of a boid.
  * @param {BoidActor} actor The boid actor to be painted.
  * @returns {number[]} A model matrix.
  */
 function actorToModel(actor) {
-  
-  const scale = 0.2;
-  return glMatrix.mat4.fromRotationTranslationScale(
-    [], 
-    glMatrix.quat.fromEuler([], 
-      Math.acos(actor.heading[0])*(180/Math.PI),
-      Math.acos(actor.heading[1])*(180/Math.PI),
-      Math.acos(actor.heading[2])*(180/Math.PI)
-    ),
+
+  // Converts radians to degrees
+  const k = 180/Math.PI
+  const scale = 0.2; // draw scale
+
+  // Direction vector to euler angles.
+  const orientation = glMatrix.quat.fromEuler([], 
+    -glMatrix.vec3.dot(actor.heading, [0,1,0])*90, // up and down
+    Math.acos(actor.heading[2])*k*(actor.heading[0]/Math.abs(actor.heading[0])),
+    0,
+  )
+
+  // Model matrix
+  return glMatrix.mat4.fromRotationTranslationScale([], 
+    orientation,
     actor.position, 
     [scale,scale,scale]
   );
 }
-
