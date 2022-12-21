@@ -7,7 +7,7 @@ export class CameraController {
     constructor(radialSensitivity = 0.01, tangentSensitivity = 0.1 ) {
 
         this.angle = 0;
-        this.radius = 50;
+        this.radius = 35;
         this.clickPos = null;
         this.rSense = radialSensitivity;
         this.tSense = tangentSensitivity;

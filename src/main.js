@@ -17,17 +17,21 @@ Vue.createApp({
 
     mounted() {
         console.log('Vue app mounted successfully!')
-        const fpsTarget = 60;
+        const fpsTarget = 150;
 
         // Setup REGL and scene
         const camController = new CameraController();
         const painter = new Painter('webgl-canvas', camController);
         const tank = new BoidTank(painter, {
-            boidCountTarget: 1000,
+            boidCountTarget: 40,
             is2dSpace: false,
-            tankSize: [10, 10, 10],
+            tankSize: [
+                window.innerWidth/200, 
+                window.innerHeight/250, 
+                window.innerWidth/200
+            ],
             timeStepInSecs: 1/fpsTarget,
-            boidSpeed: 4.0
+            boidSpeed: 3
         });
 
         // Iterate tank
