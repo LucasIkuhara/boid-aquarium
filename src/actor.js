@@ -15,6 +15,7 @@ const vec3 = glMatrix.vec3;
  * Noise is added to their intended movement direction, to make them more natural. randomness is
  * the scale of the noise compared to the movement (eg. randomness=1 means 1/2 of the movement is
  * determined by noise).
+ * @property {number} boidSpeed The nominal boid moving speed per second. 
  */
 
 /**
@@ -79,7 +80,7 @@ export class BoidActor {
      */
     computePosition() {
 
-        const moveBy = this.env.boidSpeed * this.env.timeStepInSecs;
+        const moveBy = this.cfg.boidSpeed * this.env.timeStepInSecs;
 
         let pos = [
             this.position[0] + this.heading[0]*moveBy,

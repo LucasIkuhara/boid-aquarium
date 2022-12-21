@@ -33,16 +33,16 @@ Vue.createApp({
                     window.innerWidth/200
                 ],
                 timeStepInSecs: 1/fpsTarget,
-                boidSpeed: 3
             },
-
+            
             // Boid settings
             {
                 viewingRange: 0.5,
                 tooClose: 0.3,
                 tooFar: 0.4,
                 randomness: 0.02,
-                turnSpeed: 1
+                turnSpeed: 10,
+                boidSpeed: 3
             }
         );
 

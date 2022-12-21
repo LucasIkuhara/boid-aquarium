@@ -54,23 +54,11 @@ export class BoidTank {
     }
 }
 
-
 /**
  * Represents the settings of the environment in which the boids are placed in.
+ * @typedef {object} EnvConfig
+ * @property {number[3]} tankSize Depicts the dimensions of the environment as number[] of length 3.
+ * @property {number} timeStepInSecs The size of simulation steps in seconds (ex: 0.2s per step).
+ * @property {number} boidCountTarget The desired amount of boids in the tank.
+ * @property {boolean} is2dSpace Indicates wether or not the boids should be simulated in 2D.
  */
-class EnvConfig {
-    /** Depicts the dimensions of the environment as number[] of length 3. */
-    tankSize = [100, 100, 100];
-
-    /** The size of simulation steps in seconds (ex: 0.2s per step), */
-    timeStepInSecs = 1;
-
-    /** The desired amount of boids in the tank. */
-    boidCountTarget = 10;
-
-    /** Indicates wether or not the boids should be simulated in 2D. */
-    is2dSpace = true;
-
-    /** The nominal boid moving speed per second. */
-    boidSpeed = 40;
-}
