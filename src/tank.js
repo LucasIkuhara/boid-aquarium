@@ -9,9 +9,10 @@ export class BoidTank {
      * @constructor
      * @param {Painter} painter A Painter object.
      * @param {EnvConfig} env The tank environment settings.
+     * @param {BoidCfg} cfg The parameters for boid creation.
      * @param {boolean} debug Enable debugging logs.
      */
-    constructor(painter, env, debug=false) {
+    constructor(painter, env, cfg, debug=false) {
 
         this.env = env;
         this.painter = painter;
@@ -20,10 +21,13 @@ export class BoidTank {
 
         this.boids = []
         for (let i=0; i<env.boidCountTarget; i++) {
-            this.boids.push(new BoidActor(env))
+            this.boids.push(new BoidActor(env, cfg))
         }
     }
 
+    /**
+     * Draws all boids in the tank.
+     */
     paintAll() {
         this.painter.paintBackground();
         this.boids.forEach(boid => this.painter.paintBoid(boid));

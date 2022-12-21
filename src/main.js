@@ -3,7 +3,6 @@ import { BoidTank } from './tank.js'
 import { CameraController } from './camera.js'
 
 
-
 Vue.createApp({
     data() {
         return {
@@ -22,17 +21,30 @@ Vue.createApp({
         // Setup REGL and scene
         const camController = new CameraController();
         const painter = new Painter('webgl-canvas', camController);
-        const tank = new BoidTank(painter, {
-            boidCountTarget: 40,
-            is2dSpace: false,
-            tankSize: [
-                window.innerWidth/200, 
-                window.innerHeight/250, 
-                window.innerWidth/200
-            ],
-            timeStepInSecs: 1/fpsTarget,
-            boidSpeed: 3
-        });
+        const tank = new BoidTank(painter, 
+
+            // Environment settings
+            {
+                boidCountTarget: 40,
+                is2dSpace: false,
+                tankSize: [
+                    window.innerWidth/200, 
+                    window.innerHeight/250, 
+                    window.innerWidth/200
+                ],
+                timeStepInSecs: 1/fpsTarget,
+                boidSpeed: 3
+            },
+
+            // Boid settings
+            {
+                viewingRange: 0.5,
+                tooClose: 0.3,
+                tooFar: 0.4,
+                randomness: 0.02,
+                turnSpeed: 1
+            }
+        );
 
         // Iterate tank
         setInterval(() => {tank.simStep();}, 1000/fpsTarget)
