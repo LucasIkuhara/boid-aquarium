@@ -30,7 +30,7 @@ export class BoidTank {
      */
     paintAll() {
         this.painter.paintBackground();
-        this.boids.forEach(boid => this.painter.paintBoid(boid));
+        this.painter.paintBoids(this.boids);
     }
 
     /**

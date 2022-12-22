@@ -7,7 +7,7 @@ export class CameraController {
     constructor(radialSensitivity = 0.01, tangentSensitivity = 0.1 ) {
 
         this.angle = 0;
-        this.radius = 35;
+        this.radius = 20;
         this.clickPos = null;
         this.rSense = radialSensitivity;
         this.tSense = tangentSensitivity;
@@ -45,10 +45,10 @@ export class CameraController {
      */
     get perspectiveMatrix() {
         return glMatrix.mat4.perspective([],
-            window.innerHeight, // Vertical resolution
+            60*Math.PI/180, // Vertical resolution
             window.innerWidth/window.innerHeight, // Aspect-ratio
-            0.001, // Min dist
-            null // Max dist
+            10000, // Max dist
+            0.01, // Min dist
         );
     }
 

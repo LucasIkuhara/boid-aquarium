@@ -71,14 +71,18 @@ export class Painter {
     }
     
     /**
-     * Draws a boid on the controlled canvas.
-     * @param {PaintableBoid} boid A boid to be painted on to the canvas.
+     * Draws all boids inputted on the controlled canvas.
+     * @param {PaintableBoid[]} boids An array of boids to be painted on to the canvas.
      */
-    paintBoid(boid) {
-      this.boidShader({
+    paintBoids(boids) {
+
+      const paintableBoids = boids.map(boid => { return {
         perspectiveMatrix: this.camera.perspectiveMatrix,
         viewMatrix: this.camera.viewMatrix,
-        modelMatrix: actorToModel(boid)});
+        modelMatrix: actorToModel(boid)
+      }});
+
+      this.boidShader(paintableBoids);
     }
 }
 
