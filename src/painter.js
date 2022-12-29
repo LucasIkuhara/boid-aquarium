@@ -1,7 +1,8 @@
 import { BoidActor } from './actor.js';
+import { quaternionFromAxisAngle } from './utils.js';
 import frag from './shaders/boid_frag.js'
 import vert from './shaders/boid_vert.js'
-import model from './boid_model.js'
+import model from './models/boid_fish.js'
 
 
 /**
@@ -38,8 +39,8 @@ export class Painter {
         frag: frag,
         vert: vert,
         attributes: {
-          position: model.pos,
-          normal: model.pos
+          position: model.vertex,
+          normal: model.normal
         },
         depth: {
           enable: true,
@@ -121,10 +122,10 @@ function actorToModel(actor) {
   // Direction vector to euler angles.
   const orientation = glMatrix.quat.fromEuler([], 
     -glMatrix.vec3.dot(actor.orientation.axis, [0,1,0])*90, // up and down
-    Math.acos(actor.orientation.axis[2])*k*(actor.orientation.axis[0]/Math.abs(actor.orientation.axis[0])),
-    0,
+    Math.acos(actor.orientation.axis[2])*k*(actor.orientation.axis[0]/Math.abs(actor. orientation.axis[0])),
+    90,
   )
-
+  // const orientation = quaternionFromAxisAngle(actor.orientation)
   // Model matrix
   return glMatrix.mat4.fromRotationTranslationScale([], 
     orientation,

@@ -75,6 +75,21 @@ export function lerp(a, b, factor) {
     // make sure the factor is between 0 and 1.
     factor = Math.min(1, factor)
     factor = Math.max(0, factor)
+
+    const value = (1-factor)*a + factor*b;
+    return value
+}
+
+/**
+ * 
+ * @param {AxisAngle} x 
+ * @returns {number[]} A quaternion representing the same rotation.
+ */
+export function quaternionFromAxisAngle(x) {
+    const factor = Math.sin(x.angle/2);
+    const axis = vec3.scale([], x.axis, factor);
+    const value = glMatrix.quat.fromValues(  0, ...axis,);
+    return value;
 }
 
 /**
