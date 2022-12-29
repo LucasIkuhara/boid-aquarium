@@ -1,5 +1,5 @@
 const vec3 = glMatrix.vec3;
-import { random, applyNoiseToAxisAngle } from './utils.js';
+import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
 
 /** Type imports 
  * @typedef {import('./utils').AxisAngle} AxisAngle
@@ -74,7 +74,7 @@ export class BoidActor {
                 random(0.5), 
                 this.env.is2dSpace ? 0 : random(0.5)
             ],
-            angle: random(2*Math.PI)
+            angle: Math.random()*2*Math.PI
         }
 
     }
@@ -93,13 +93,12 @@ export class BoidActor {
      */
     computePosition() {
 
+        // Factor accounting for time step and speed
         const moveBy = this.cfg.boidSpeed * this.env.timeStepInSecs;
 
-        let pos = [
-            this.position[0] + this.orientation.axis[0]*moveBy,
-            this.position[1] + this.orientation.axis[1]*moveBy,
-            this.position[2] + this.orientation.axis[2]*moveBy
-        ]
+        // Compute movement vector and new position
+        const displacementVector = vec3.scale([], this.orientation.axis, moveBy);
+        let pos = vec3.add([], this.position, displacementVector);
 
         // Make the boids bounce back, in case they are escaping the tank
         pos.forEach((val, index) => {
@@ -132,11 +131,11 @@ export class BoidActor {
 
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
-        
+
         // Move closer
         if (distance < this.cfg.tooClose)
             newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.inverse([], boidToPeers), turnRate);
-        
+
         // Move farther
         if (distance > this.cfg.tooFar)
             newOrientation.axis = vec3.lerp([], this.orientation.axis, boidToPeers, turnRate);
@@ -144,11 +143,11 @@ export class BoidActor {
         // Move alongside
         else {
             newOrientation.axis = vec3.lerp([], this.orientation.axis, avg.orientation.axis, turnRate);
-            // newOrientation.angle = lerp(this.angle, ab)
+            newOrientation.angle = lerp(this.angle, avg.orientation.angle, turnRate);
         }
 
         // Add randomness
-        return applyNoiseToAxisAngle(newHeading, this.cfg.randomness);
+        return applyNoiseToAxisAngle(newOrientation, this.cfg.randomness);
     } 
     
     /**
@@ -168,31 +167,27 @@ export class BoidActor {
     /**
      * Computes the average pose of a group of BoidActors.
      * @param {BoidActor[]} peers A group of boids.
-     * @returns {Pose} The average position and heading of all boids in the group.
+     * @returns {Pose} The average position and orientation of all boids in the group.
      */
     static averagePeers(peers) {
 
-        let count = 0;
-
         // Accumulate all headings and positions
         let avg = peers.reduce(
-            (prev, curr) => { 
-                count++;
-                return {
+            (prev, curr) => ({
                 position: vec3.add([], prev.position, curr.position),
                 orientation: {
-                    heading: vec3.add([], prev.orientation, curr.orientation),
-                    angle: prev.angle + curr.angle
+                    axis: vec3.add([], prev.orientation.axis, curr.orientation.axis),
+                    angle: prev.orientation.angle + curr.orientation.angle
                 }
-            }},
-        {position: [0,0,0], orientation: {heading: [0,0,0], angle: 0}});
-
+            }),
+        {position: [0,0,0], orientation: {axis: [0,0,0], angle: 0}});
+  
         // Vector normalization
         avg = {
-            position: vec3.scale([], avg.position, 1/count),
+            position: vec3.scale([], avg.position, 1/peers.length),
             orientation: {
-                heading: vec3.normalize([], avg.orientation),
-                angle: avg.orientation.angle/(count*2*Math.PI)
+                axis: vec3.normalize([], avg.orientation.axis),
+                angle: avg.orientation.angle/(peers.length*2*Math.PI)
             }
         };
 

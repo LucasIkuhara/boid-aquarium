@@ -1,3 +1,5 @@
+const vec3 = glMatrix.vec3;
+
 /**
  * Represents an orientation using a heading vector (axis) and an angle.
  * @typedef {object} AxisAngle
@@ -50,10 +52,10 @@ export function applyNoiseToVec3(x, scale, normalize=true) {
 export function applyNoiseToAxisAngle(x, scale, normalize=true) {
 
     const newAxis = applyNoiseToVec3(x.axis, scale, normalize);
-    let newAngle = x.angle + Math.random * scale * 2 * Math.PI;
+    let newAngle = x.angle + Math.random() * scale * 2 * Math.PI;
 
     if (normalize)
-        newAngle = newAngle % (2* Math.PI);
+        newAngle = newAngle % (2 * Math.PI);
 
     return {
         axis: newAxis,

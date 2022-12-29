@@ -120,8 +120,8 @@ function actorToModel(actor) {
 
   // Direction vector to euler angles.
   const orientation = glMatrix.quat.fromEuler([], 
-    -glMatrix.vec3.dot(actor.heading, [0,1,0])*90, // up and down
-    Math.acos(actor.heading[2])*k*(actor.heading[0]/Math.abs(actor.heading[0])),
+    -glMatrix.vec3.dot(actor.orientation.axis, [0,1,0])*90, // up and down
+    Math.acos(actor.orientation.axis[2])*k*(actor.orientation.axis[0]/Math.abs(actor.orientation.axis[0])),
     0,
   )
 
