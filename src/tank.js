@@ -1,6 +1,19 @@
 import { Painter } from "./painter.js"
 import { BoidActor } from "./actor.js"
 
+/** Type imports
+ * @typedef {import('./actor').BoidCfg} BoidCfg
+ */
+
+/**
+ * Represents the settings of the environment in which the boids are placed in.
+ * @typedef {object} EnvConfig
+ * @property {number[3]} tankSize Depicts the dimensions of the environment as number[] of length 3.
+ * @property {number} timeStepInSecs The size of simulation steps in seconds (ex: 0.2s per step).
+ * @property {number} boidCountTarget The desired amount of boids in the tank.
+ * @property {boolean} is2dSpace Indicates wether or not the boids should be simulated in 2D.
+ */
+
 
 export class BoidTank {
 
@@ -53,14 +66,3 @@ export class BoidTank {
         this.paintAll()
     }
 }
-
-/**
- * Represents the settings of the environment in which the boids are placed in.
- * @typedef {object} EnvConfig
- * @property {number[3]} tankSize Depicts the dimensions of the environment as number[] of length 3.
- * @property {number} timeStepInSecs The size of simulation steps in seconds (ex: 0.2s per step).
- * @property {number} boidCountTarget The desired amount of boids in the tank.
- * @property {boolean} is2dSpace Indicates wether or not the boids should be simulated in 2D.
- * @typedef {import('./actor').BoidCfg} BoidCfg
- */
-
