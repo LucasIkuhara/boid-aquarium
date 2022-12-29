@@ -8,7 +8,7 @@ export default `
   void main () {
     
     // Scene Params
-    vec3 lightDir = normalize(vec3(0.5, 0.4, -0.5));
+    vec3 lightDir = normalize(vec3(-0.5, -0.4, -0.5));
     vec3 lightColor = vec3(0.2, 0.2, 0.2);
     float ambient = 0.6;
     
