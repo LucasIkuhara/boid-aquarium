@@ -83,8 +83,9 @@ export class BoidActor {
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
     act() {
-        this.orientation = this.computeOrientation()
-        this.position = this.computePosition()
+        const orientation = this.computeOrientation();
+        this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
+        this.position = this.computePosition();
     }
 
     /**
@@ -116,11 +117,9 @@ export class BoidActor {
      */
     computeOrientation() {
 
-        // Get all visible neighbors. If there aren't any, keep course,
-        // but with noise applied to the new heading.
+        // Get all visible neighbors. If there aren't any, keep current course.
         const visiblePeers = this.getVisiblePeers();
-        if (visiblePeers.length < 1) 
-            return applyNoiseToAxisAngle(this.orientation, this.cfg.randomness);
+        if (visiblePeers.length < 1)  return this.orientation
 
         // If there are visible peers, compute new orientation based on them.
         let newOrientation = { axis: null, angle: this.orientation.angle };
@@ -143,11 +142,10 @@ export class BoidActor {
         // Move alongside
         else {
             newOrientation.axis = vec3.lerp([], this.orientation.axis, avg.orientation.axis, turnRate);
-            newOrientation.angle = lerp(this.angle, avg.orientation.angle, turnRate);
+            newOrientation.angle = lerp(this.orientation.angle, avg.orientation.angle, turnRate);
         }
 
-        // Add randomness
-        return applyNoiseToAxisAngle(newOrientation, this.cfg.randomness);
+        return newOrientation;
     } 
     
     /**
