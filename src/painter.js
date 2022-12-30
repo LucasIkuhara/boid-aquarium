@@ -115,17 +115,9 @@ export class Painter {
  */
 function actorToModel(actor) {
 
-  // Converts radians to degrees
-  const k = 180/Math.PI
   const scale = 0.2; // draw scale
+  const orientation = quaternionFromAxisAngle(actor.orientation);
 
-  // Direction vector to euler angles.
-  const orientation = glMatrix.quat.fromEuler([], 
-    -glMatrix.vec3.dot(actor.orientation.axis, [0,1,0])*90, // up and down
-    Math.acos(actor.orientation.axis[2])*k*(actor.orientation.axis[0]/Math.abs(actor. orientation.axis[0])),
-    90,
-  )
-  // const orientation = quaternionFromAxisAngle(actor.orientation)
   // Model matrix
   return glMatrix.mat4.fromRotationTranslationScale([], 
     orientation,
