@@ -4,7 +4,7 @@ const vec3 = glMatrix.vec3;
  * Represents an orientation using a heading vector (axis) and an angle.
  * @typedef {object} AxisAngle
  * @property {number[]} axis A unit-vector of size 3 representing the heading of an object.
- * @property {number} angle An angle between 0 and (2 x Pi) representing the rotation along the axis vector.
+ * @property {number} angle An angle between (-2 x Pi) and (2 x Pi) representing the rotation along the axis vector.
 */
 
 /**
@@ -45,14 +45,14 @@ export function applyNoiseToVec3(x, scale, normalize=true) {
  * @param {readonly AxisAngle} x The input value.
  * @param {number} scale The scale as percentage of the noise added.
  * @param {boolean} normalize Wether to normalize the output.
- * Will always return a unit-vector and an angle in [0, 2.Pi] if enabled. Defaults to true.
+ * Will always return a unit-vector and an angle in [-2.Pi, 2.Pi] if enabled. Defaults to true.
  * 
  * @returns {AxisAngle} The original value with noise applied to it.
  */
 export function applyNoiseToAxisAngle(x, scale, normalize=true) {
 
     const newAxis = applyNoiseToVec3(x.axis, scale, normalize);
-    let newAngle = x.angle + Math.random() * scale * 2 * Math.PI;
+    let newAngle = x.angle + random(scale*2*Math.PI);
 
     if (normalize)
         newAngle = newAngle % (2 * Math.PI);
@@ -81,16 +81,24 @@ export function lerp(a, b, factor) {
 }
 
 /**
+ * Converts an orientation from the Axis-Angle representation to a unit Quaternion.
+ * Reference: https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  * 
- * @param {AxisAngle} x 
+ * @param {AxisAngle} x The input axis-angle rotation.
  * @returns {number[]} A quaternion representing the same rotation.
  */
 export function quaternionFromAxisAngle(x) {
-    const factor = Math.sin(x.angle/2);
-    const axis = vec3.scale([], x.axis, factor);
-    const value = glMatrix.quat.fromValues(  0, ...axis,);
-    return value;
-}
+
+    // const theta = Math.PI/2//isNaN(x.angle/2) ? 0 : x.angle/2;
+    // const factor = Math.sin(theta);
+    // // console.log(theta)
+    // const axis = vec3.scale([], x.axis, factor);
+    // const value = glMatrix.quat.fromValues(...axis, Math.cos(theta));
+    // console.log(value)
+
+    return glMatrix.quat.setAxisAngle([], x.axis, x.angle)
+    // return value;
+} 
 
 /**
  * Generates a random number, either positive or negative in the scale given [scale, scale]

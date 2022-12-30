@@ -74,7 +74,7 @@ export class BoidActor {
                 random(0.5), 
                 this.env.is2dSpace ? 0 : random(0.5)
             ],
-            angle: Math.random()*2*Math.PI
+            angle: random(2*Math.PI)
         }
 
     }
@@ -187,7 +187,7 @@ export class BoidActor {
             position: vec3.scale([], avg.position, 1/peers.length),
             orientation: {
                 axis: vec3.normalize([], avg.orientation.axis),
-                angle: avg.orientation.angle/(peers.length*2*Math.PI)
+                angle: avg.orientation.angle/(peers.length)
             }
         };
 
