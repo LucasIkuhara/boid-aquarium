@@ -45,10 +45,10 @@ export class CameraController {
      */
     get perspectiveMatrix() {
         return glMatrix.mat4.perspective([],
-            60*Math.PI/180, // Vertical resolution
+            45*Math.PI/180, // Vertical resolution
             window.innerWidth/window.innerHeight, // Aspect-ratio
-            10000, // Max dist
             0.01, // Min dist
+            10000, // Max dist
         );
     }
 
@@ -61,14 +61,14 @@ export class CameraController {
         const angleInRad = this.angle*Math.PI/180;
 
         // ViewMatrix = CameraModelMatrix^(-1)
-        return glMatrix.mat4.invert([],
+       // return glMatrix.mat4.invert([],
 
             // compute CameraModelMatrix
-            glMatrix.mat4.fromRotationTranslationScale([], 
+            return glMatrix.mat4.fromRotationTranslationScale([], 
                 glMatrix.quat.fromEuler([], ...[0, this.angle, 0]), // Look at the center
                 [this.radius*Math.sin(angleInRad), 0, this.radius*Math.cos(angleInRad)], // Orbit the object using polar coordinates
                 [1, 1, 1] // No scaling
             )
-        );
+        //);
     }
 }

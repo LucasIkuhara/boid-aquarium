@@ -94,10 +94,10 @@ export function quaternionFromAxisAngle(x) {
     // // console.log(theta)
     // const axis = vec3.scale([], x.axis, factor);
     // const value = glMatrix.quat.fromValues(...axis, Math.cos(theta));
-    // console.log(value)
-
-    return glMatrix.quat.setAxisAngle([], x.axis, x.angle)
+    
+    const ori = glMatrix.quat.setAxisAngle([], x.axis, Math.PI )
     // return value;
+    return glMatrix.quat.add([], ori, glMatrix.quat.fromEuler([], 90, 0, 0))
 } 
 
 /**
