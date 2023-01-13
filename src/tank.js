@@ -39,14 +39,6 @@ export class BoidTank {
     }
 
     /**
-     * Draws all boids in the tank.
-     */
-    paintAll() {
-        this.painter.paintBackground();
-        this.painter.paintBoids(this.boids);
-    }
-
-    /**
      * Trigger all boids to compute a new state.
      */
     triggerAll() {
@@ -63,6 +55,6 @@ export class BoidTank {
             console.log("[FRAME]:", this.frame)
         }
         this.triggerAll();
-        this.paintAll()
+        this.painter.paintScene(this.boids, this.env)
     }
 }

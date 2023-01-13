@@ -81,26 +81,6 @@ export function lerp(a, b, factor) {
 }
 
 /**
- * Converts an orientation from the Axis-Angle representation to a unit Quaternion.
- * Reference: https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
- * 
- * @param {AxisAngle} x The input axis-angle rotation.
- * @returns {number[]} A quaternion representing the same rotation.
- */
-export function quaternionFromAxisAngle(x) {
-
-    // const theta = Math.PI/2//isNaN(x.angle/2) ? 0 : x.angle/2;
-    // const factor = Math.sin(theta);
-    // // console.log(theta)
-    // const axis = vec3.scale([], x.axis, factor);
-    // const value = glMatrix.quat.fromValues(...axis, Math.cos(theta));
-    
-    const ori = glMatrix.quat.setAxisAngle([], x.axis, Math.PI )
-    // return value;
-    return glMatrix.quat.add([], ori, glMatrix.quat.fromEuler([], 90, 0, 0))
-} 
-
-/**
  * Generates a random number, either positive or negative in the scale given [scale, scale]
  * @param {number} scale 
  * @returns A random number.
