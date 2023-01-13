@@ -14,13 +14,15 @@ Vue.createApp({
     computed: {
     },
 
-    mounted() {
+    async mounted() {
         console.log('Vue app mounted successfully!')
+        
         const fpsTarget = 150;
 
-        // Setup REGL and scene
+        // Setup THREE.js and scene
         const camController = new CameraController();
         const painter = new Painter('webgl-canvas', camController);
+        await painter.loadModels();
         const tank = new BoidTank(painter, 
 
             // Environment settings
@@ -28,9 +30,9 @@ Vue.createApp({
                 boidCountTarget: 40,
                 is2dSpace: false,
                 tankSize: [
-                    window.innerWidth/200, 
-                    window.innerHeight/250, 
-                    window.innerWidth/200
+                    window.innerWidth/100, 
+                    window.innerHeight/100, 
+                    window.innerWidth/100
                 ],
                 timeStepInSecs: 1/fpsTarget,
             },
@@ -40,9 +42,9 @@ Vue.createApp({
                 viewingRange: 0.5,
                 tooClose: 0.3,
                 tooFar: 0.4,
-                randomness: 0.02,
+                randomness: 0.00002,
                 turnSpeed: 10,
-                boidSpeed: 3
+                boidSpeed: 5
             }
         );
 

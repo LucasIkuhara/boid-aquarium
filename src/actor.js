@@ -1,5 +1,10 @@
 const vec3 = glMatrix.vec3;
+import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
 
+/** Type imports 
+ * @typedef {import('./utils').AxisAngle} AxisAngle
+ * @typedef {import('./utils').Pose} Pose
+ * */
 
 /**
  * Defines the behavior of a boid, by providing parameters for its actions.
@@ -58,11 +63,19 @@ export class BoidActor {
             this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
         ]
 
-        this.heading = [
-            random(0.5), 
-            random(0.5), 
-            this.env.is2dSpace ? 0 : random(0.5)
-        ]
+        /**
+         * @type {AxisAngle}
+         * Start with a random orientation
+         * Uses Axis-angle representation.
+         */
+        this.orientation = {
+            axis: [
+                random(0.5), 
+                random(0.5), 
+                this.env.is2dSpace ? 0 : random(0.5)
+            ],
+            angle: random(2*Math.PI)
+        }
 
     }
 
@@ -70,8 +83,9 @@ export class BoidActor {
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
     act() {
-        this.heading = this.computeHeading()
-        this.position = this.computePosition()
+        const orientation = this.computeOrientation();
+        this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
+        this.position = this.computePosition();
     }
 
     /**
@@ -80,59 +94,58 @@ export class BoidActor {
      */
     computePosition() {
 
+        // Factor accounting for time step and speed
         const moveBy = this.cfg.boidSpeed * this.env.timeStepInSecs;
 
-        let pos = [
-            this.position[0] + this.heading[0]*moveBy,
-            this.position[1] + this.heading[1]*moveBy,
-            this.position[2] + this.heading[2]*moveBy
-        ]
+        // Compute movement vector and new position
+        const displacementVector = vec3.scale([], this.orientation.axis, moveBy);
+        let pos = vec3.add([], this.position, displacementVector);
 
         // Make the boids bounce back, in case they are escaping the tank
         pos.forEach((val, index) => {
             if (Math.abs(val) > this.env.tankSize[index]) 
-                this.heading[index] = -this.heading[index];
+                this.orientation.axis[index] = -this.orientation.axis[index];
         });
 
         return pos;
     }
 
     /**
-     * Computes a new heading based on its peers.
+     * Computes a new orientation based on its peers.
      * This is the core of boid grouping behavior.
-     * @returns {number[]} The new heading for that boid.
+     * @returns {AxisAngle} The new orientation for that boid.
      */
-    computeHeading() {
+    computeOrientation() {
 
-        let newHeading;
-        const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
-
-        // Get all visible neighbors. If there aren't any, keep course,
-        // but with noise applied to the new heading.
+        // Get all visible neighbors. If there aren't any, keep current course.
         const visiblePeers = this.getVisiblePeers();
-        if (visiblePeers.length < 1) 
-            return applyNoiseToVec3(this.heading, this.cfg.randomness);
+        if (visiblePeers.length < 1)  return this.orientation
+
+        // If there are visible peers, compute new orientation based on them.
+        let newOrientation = { axis: null, angle: this.orientation.angle };
+        const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
         
         // Compute the average position and heading of visible peers.
         const avg = BoidActor.averagePeers(visiblePeers);
 
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
-        
+
         // Move closer
         if (distance < this.cfg.tooClose)
-        newHeading = vec3.lerp([], this.heading, vec3.inverse([], boidToPeers), turnRate);    
-        
+            newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.inverse([], boidToPeers), turnRate);
+
         // Move farther
         if (distance > this.cfg.tooFar)
-        newHeading = vec3.lerp([], this.heading, boidToPeers, turnRate);
+            newOrientation.axis = vec3.lerp([], this.orientation.axis, boidToPeers, turnRate);
 
         // Move alongside
-        else
-            newHeading = vec3.lerp([], this.heading, avg.heading, turnRate);
+        else {
+            newOrientation.axis = vec3.lerp([], this.orientation.axis, avg.orientation.axis, turnRate);
+            newOrientation.angle = lerp(this.orientation.angle, avg.orientation.angle, turnRate);
+        }
 
-        // Add randomness
-        return applyNoiseToVec3(newHeading, this.cfg.randomness)
+        return newOrientation;
     } 
     
     /**
@@ -152,70 +165,30 @@ export class BoidActor {
     /**
      * Computes the average pose of a group of BoidActors.
      * @param {BoidActor[]} peers A group of boids.
-     * @returns {BoidPose} The average position and heading of all boids in the group.
+     * @returns {Pose} The average position and orientation of all boids in the group.
      */
     static averagePeers(peers) {
 
-        let count = 0;
-
         // Accumulate all headings and positions
         let avg = peers.reduce(
-            (prev, curr) => { 
-                count++;
-                return {
+            (prev, curr) => ({
                 position: vec3.add([], prev.position, curr.position),
-                heading: vec3.add([], prev.heading, curr.heading)
-            }},
-        {position: [0,0,0], heading: [0,0,0]});
-
+                orientation: {
+                    axis: vec3.add([], prev.orientation.axis, curr.orientation.axis),
+                    angle: prev.orientation.angle + curr.orientation.angle
+                }
+            }),
+        {position: [0,0,0], orientation: {axis: [0,0,0], angle: 0}});
+  
         // Vector normalization
         avg = {
-            position: vec3.scale([], avg.position, 1/count),
-            heading: vec3.normalize([], avg.heading)
+            position: vec3.scale([], avg.position, 1/peers.length),
+            orientation: {
+                axis: vec3.normalize([], avg.orientation.axis),
+                angle: avg.orientation.angle/(peers.length)
+            }
         };
 
         return avg;
     }
-}
-
-/**
- * Represents the pose of a Boid. Contains their position and heading.
- * @typedef {object} BoidPose
- * @property position: vec3.scale([], avg.position, 1/count),
- * @property heading: vec3.normalize([], avg.heading)
-*/
-
-/**
- * Generates a random number, either positive or negative in the scale given [scale, scale]
- * @param {number} scale 
- * @returns A random number.
-*/
-function random(scale) {
-    return ((Math.random()*2)-1)*scale;
-    
-}
-
-/**
- * Applies random noise to the given vector.
- * 
- * @param {readonly number[]} x The input vector
- * @param {number} scale The scale (norm) of the noise vector.
- * @param {boolean} normalize Wether to normalize the output.
- * Will always return a unit-vector if enabled. Defaults to true.
- * 
- * @returns {number[]} The original vector with noise applied to it.
- */
-function applyNoiseToVec3(x, scale, normalize=true) {
-    
-    // Add noise
-    let noisyVec = vec3.add([], 
-        x, 
-        vec3.random([], scale)
-    )
-
-    // Transform to a unit-vector
-    if (normalize)
-        noisyVec = vec3.normalize([], noisyVec);
-
-    return noisyVec;
 }
