@@ -25,7 +25,8 @@ export class CameraController {
     }
 
     /**
-     * Registers callbacks to enable handling mouse movement.
+     * Registers callbacks to enable handling mouse movement and touch
+     * screen events.
      */
     registerClickCallback() {
 
@@ -41,13 +42,17 @@ export class CameraController {
                 this.clickPos = {x: event.x, y: event.y};
                 this.updateCameraObject();
             }
+            document.ontouchmove = document.onmousemove;
         }
+        document.ontouchstart = document.onmousedown;
 
         // On release
         document.onmouseup = () => {
             document.onmousemove = null;
             this.clickPos = null;
         }
+        document.ontouchend = document.onmouseup;
+
     }
 
     /**
