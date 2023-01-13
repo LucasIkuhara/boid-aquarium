@@ -11,13 +11,13 @@ export class CameraController {
 
         // Camera configuration
         this.angle = 0;
-        this.radius = 20;
+        this.radius = 30;
         this.clickPos = null;
         this.rSense = radialSensitivity;
         this.tSense = tangentSensitivity;
 
         // Create THREE.js Camera
-        this._camera = new THREE.PerspectiveCamera(75, 2, 0.001, 50);
+        this._camera = new THREE.PerspectiveCamera(75, 2, 0.001, 100);
         this.updateCameraObject()
 
         // Start tracking mouse clicks and drags

@@ -27,12 +27,12 @@ Vue.createApp({
 
             // Environment settings
             {
-                boidCountTarget: 30,
+                boidCountTarget: 40,
                 is2dSpace: false,
                 tankSize: [
-                    2,
-                   2, 
-                    3
+                    window.innerWidth/100, 
+                    window.innerHeight/100, 
+                    window.innerWidth/100
                 ],
                 timeStepInSecs: 1/fpsTarget,
             },
@@ -44,7 +44,7 @@ Vue.createApp({
                 tooFar: 0.4,
                 randomness: 0.00002,
                 turnSpeed: 10,
-                boidSpeed: 0.5
+                boidSpeed: 5
             }
         );
 
