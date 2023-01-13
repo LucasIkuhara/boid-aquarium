@@ -75,9 +75,11 @@ export class Painter {
 			this.scene.add(boidObj);
 		});
 
-		// Create aquarium walls
+		// Create aquarium walls, adding a constant to the size of the aquarium, to
+		// account for the size of the model, as physics are computed from the Mesh's origin.
+		const wallOffset = 0.8;
 		this.scene.add(new THREE.Mesh(
-			new THREE.BoxGeometry(...env.tankSize.map(n => n*2)),
+			new THREE.BoxGeometry(...env.tankSize.map(n => (n + wallOffset)*2)),
 			new THREE.MeshBasicMaterial({color: 0x44aa88, wireframe: true})
 		))
 
