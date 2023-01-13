@@ -34,23 +34,36 @@ export class CameraController {
         document.onmousedown = event => {
             if (!this.clickPos)
                 this.clickPos = {x: event.x, y: event.y};
-            
-            // On move
+ 
+            // On mouse move
             document.onmousemove = event => {
                 this.angle = this.angle + -1*(event.x - this.clickPos.x)*this.tSense;
                 this.radius = this.radius + (event.y - this.clickPos.y)*this.rSense;
                 this.clickPos = {x: event.x, y: event.y};
                 this.updateCameraObject();
             }
-            document.ontouchmove = document.onmousemove;
         }
-        document.ontouchstart = document.onmousedown;
 
-        // On release
+        // On mouse release
         document.onmouseup = () => {
             document.onmousemove = null;
             this.clickPos = null;
         }
+
+        // Touchscreen click
+        document.ontouchstart = event => {
+            if (!this.clickPos)
+            this.clickPos = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
+            
+            // Touchscreen move
+            document.ontouchmove = event => {
+                this.angle = this.angle + -1*(event.targetTouches[0].clientX - this.clickPos.x)*this.tSense;
+                this.radius = this.radius + (event.targetTouches[0].clientY - this.clickPos.y)*this.rSense;
+                this.clickPos = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
+                this.updateCameraObject();
+            }
+        }
+
         document.ontouchend = document.onmouseup;
 
     }
