@@ -39,11 +39,11 @@ Vue.createApp({
             
             // Boid settings
             {
-                viewingRange: 0.5,
-                tooClose: 0.3,
-                tooFar: 0.4,
-                randomness: 0.00002,
-                turnSpeed: 10,
+                viewingRange: 1.5,
+                tooClose: 0.9,
+                tooFar: 1.3,
+                randomness: 0.02,
+                turnSpeed: 5,
                 boidSpeed: 5
             }
         );
