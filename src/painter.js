@@ -1,6 +1,9 @@
 import { BoidActor } from './actor.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
 
 /**
  * Responsible for interacting with the canvas element to draw objects on it.
@@ -14,17 +17,26 @@ export class Painter {
 	 * @param {CameraObject} camera The camera through which the scene is viewed.
 	 */
 	constructor(canvasElementId, camera) {
-	this.isLoading = true;
+		this.isLoading = true;
 
-	// Setup THREE.js
-	const canvas = document.querySelector(`#${canvasElementId}`);
-	this.renderer = new THREE.WebGLRenderer({canvas});
+		// Setup THREE.js
+		const canvas = document.querySelector(`#${canvasElementId}`);
+		this.renderer = new THREE.WebGLRenderer({canvas});
+		this.renderer.setClearAlpha(0)
 
-	this.scene = new THREE.Scene()
-	this.isSceneReady = false;
+		this.scene = new THREE.Scene()
+		this.isSceneReady = false;
 
-	// Register camera
-	this.camera = camera;
+		// Register camera
+		this.camera = camera;
+
+		// Post processing
+		this.composer = new EffectComposer( this.renderer );
+		this.composer.addPass( new RenderPass( this.scene, this.camera.threeCamera ) );
+
+		// const afterimagePass = new AfterimagePass();
+		// afterimagePass.uniforms['damp'] = 0.99
+		// this.composer.addPass( afterimagePass );
 
 	}
 
@@ -53,8 +65,12 @@ export class Painter {
 	 */
 	setupScene(boids, env) {
 
-		const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
+		// Boid material
+		const material = new THREE.MeshPhongMaterial({});
+
+		// Add lights
 		this.scene.add(new THREE.DirectionalLight());
+		this.scene.add(new THREE.AmbientLight(undefined, 0.3));
 
 		/**
 		 * A Map from Boid Actor Ids to THREE scene objects
@@ -102,7 +118,7 @@ export class Painter {
 		})
 
 		// Render a new frame
-		this.renderer.render(this.scene, this.camera.threeCamera);
+		this.composer.render(this.scene, this.camera.threeCamera);
 	}
 }
 

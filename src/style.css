@@ -1,6 +1,7 @@
 #webgl-canvas {
     flex-grow: 1;
     flex-shrink: 1;
+    background: linear-gradient(0deg, #061320, #2971b4, #bbefff);
 }
 
 .fill {
