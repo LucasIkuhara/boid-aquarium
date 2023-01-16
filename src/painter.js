@@ -70,7 +70,7 @@ export class Painter {
 
 		// Add lights
 		this.scene.add(new THREE.DirectionalLight());
-		this.scene.add(new THREE.AmbientLight(undefined, 0.3));
+		this.scene.add(new THREE.AmbientLight("rgb(187, 239, 255)", 0.3));
 
 		/**
 		 * A Map from Boid Actor Ids to THREE scene objects
