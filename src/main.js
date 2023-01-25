@@ -47,7 +47,7 @@ Vue.createApp({
             if (this.animationLoop) return;
 
             // Setup THREE.js and scene
-            const camController = new CameraController();
+            const camController = new CameraController('webgl-canvas');
             const painter = new Painter('webgl-canvas', camController);
             await painter.loadModels();
             const tank = new BoidTank(painter, cfg.env, cfg.boids);

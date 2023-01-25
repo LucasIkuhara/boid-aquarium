@@ -7,7 +7,7 @@ import * as THREE from 'three';
  */
 export class CameraController {
 
-    constructor(radialSensitivity = 0.01, tangentSensitivity = 0.1 ) {
+    constructor(canvasElementId, radialSensitivity = 0.01, tangentSensitivity = 0.1 ) {
 
         // Camera configuration
         this.angle = 0;
@@ -21,22 +21,24 @@ export class CameraController {
         this.updateCameraObject()
 
         // Start tracking mouse clicks and drags
-        this.registerClickCallback()
+		const canvas = document.getElementById(canvasElementId);
+        this.registerClickCallback(canvas);
     }
 
     /**
      * Registers callbacks to enable handling mouse movement and touch
      * screen events.
+     * @param {HTMLElement} canvas The element in which to track movements.
      */
-    registerClickCallback() {
+    registerClickCallback(canvas) {
 
         // On click
-        document.onmousedown = event => {
+        canvas.onmousedown = event => {
             if (!this.clickPos)
                 this.clickPos = {x: event.x, y: event.y};
  
             // On mouse move
-            document.onmousemove = event => {
+            canvas.onmousemove = event => {
                 this.angle = this.angle + -1*(event.x - this.clickPos.x)*this.tSense;
                 this.radius = this.radius + (event.y - this.clickPos.y)*this.rSense;
                 this.clickPos = {x: event.x, y: event.y};
@@ -45,18 +47,18 @@ export class CameraController {
         }
 
         // On mouse release
-        document.onmouseup = () => {
-            document.onmousemove = null;
+        canvas.onmouseup = () => {
+            canvas.onmousemove = null;
             this.clickPos = null;
         }
 
         // Touchscreen click
-        document.ontouchstart = event => {
+        canvas.ontouchstart = event => {
             if (!this.clickPos)
             this.clickPos = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
             
             // Touchscreen move
-            document.ontouchmove = event => {
+            canvas.ontouchmove = event => {
                 this.angle = this.angle + -1*(event.targetTouches[0].clientX - this.clickPos.x)*this.tSense;
                 this.radius = this.radius + (event.targetTouches[0].clientY - this.clickPos.y)*this.rSense;
                 this.clickPos = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
@@ -64,7 +66,7 @@ export class CameraController {
             }
         }
 
-        document.ontouchend = document.onmouseup;
+        canvas.ontouchend = canvas.onmouseup;
 
     }
 
