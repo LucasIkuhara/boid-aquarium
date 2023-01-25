@@ -1,0 +1,28 @@
+<section>
+    <link rel="stylesheet" href="menu/menu.css">
+
+    <section class="menu-border">
+
+        <div v-show="collapsed" class="menu-button" v-on:click="toggle()">
+            <i data-feather="settings"></i>
+        </div>
+    
+        <div v-show="!collapsed" class="menu-open">
+
+            <div class="menu-button" v-on:click="toggle()">
+                <i data-feather="arrow-left"></i>
+            </div>
+
+            <section class="boid-settings">
+                <ul>
+                    <li>
+                        <label for="boid-speed"> Boid Speed: </label>
+                        <input name="boid-speed" type="range" min="0" max="100" step="1" v-model="boids.boidSpeed"> 
+                        <input type="number" v-model="boids.boidSpeed"/>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+    </section>
+</section>

@@ -13,3 +13,10 @@
     overflow-y: hidden;
     display: flex;
 }
+
+#menu-component {
+    position: fixed;
+    display: flex;
+    left: 0px;
+    right: 0px;
+}
