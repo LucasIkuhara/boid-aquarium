@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 const vec3 = glMatrix.vec3;
 import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
 
@@ -200,4 +201,16 @@ export class BoidActor {
 
 export class FlashingActor extends BoidActor {
 
+    constructor(environment, config) {
+        super(environment, config);
+
+        this.phase = 2
+    }
+
+    get emission() {
+        return {
+            color: new THREE.Color(`hsl(${Math.random()*360}, 100%, 50%)`),
+            intensity: Math.random()
+        }
+    }
 }
