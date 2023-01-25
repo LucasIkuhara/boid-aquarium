@@ -20,11 +20,11 @@ export default {
 			env: {
 				boidCountTarget: 50,
 				is2dSpace: false,
-				tankSize: [
-					window.innerWidth/100, 
-					window.innerHeight/100, 
-					window.innerWidth/100
-				],
+				dimensions: {
+					x: window.innerWidth/100, 
+					y: window.innerHeight/100, 
+					z: window.innerWidth/100
+				},
 			},
 
 			// Boid Settings
@@ -84,6 +84,11 @@ export default {
 				boids: this.boids,
 				env: {
 					...this.env,
+					tankSize: [
+						Number(this.env.dimensions.x),
+						Number(this.env.dimensions.y),
+						Number(this.env.dimensions.z),
+					],
                     timeStepInSecs: 1/this.fpsTarget,
 				},
 				fpsTarget: this.fpsTarget
