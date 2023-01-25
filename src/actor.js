@@ -79,6 +79,11 @@ export class BoidActor {
 
     }
 
+    static resetBoidSim() {
+        BoidActor.boidCount = 0;
+        BoidActor.peers = [];
+    }
+
     /**
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */

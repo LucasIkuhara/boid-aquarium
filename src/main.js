@@ -2,6 +2,8 @@ import { Painter } from './painter.js'
 import { BoidTank } from './tank.js'
 import { CameraController } from './camera.js'
 import SettingsMenu from './menu/menu.js'
+import { BoidActor } from './actor.js'
+import { isolated } from './utils.js'
 
 
 Vue.createApp({
@@ -21,6 +23,7 @@ Vue.createApp({
 
         // Load Feather SVG icons
         feather.replace()
+        sessionStorage.clear()
     },
 
     methods: {
@@ -33,8 +36,10 @@ Vue.createApp({
          *  The new simulation settings for configuring the environment and boid behavior.
         */
        async handleUpdateSettings(settings) {
-           this.stopAnimationLoop()
-           await this.createAnimationLoop(settings)
+            isolated(async () => {
+                this.stopAnimationLoop()
+                await this.createAnimationLoop(settings)
+            });
         },
 
         /**
@@ -42,9 +47,6 @@ Vue.createApp({
          * @param {import('./menu/menu.js').AppCfg} cfg The animation configuration object.
         */
         async createAnimationLoop(cfg) {
-
-            // Disallow the creation of new animation loops if there is one running
-            if (this.animationLoop) return;
 
             // Setup THREE.js and scene
             const camController = new CameraController('webgl-canvas');
@@ -60,11 +62,15 @@ Vue.createApp({
         },
 
         /**
-         * Stop current animation loop.
+         * Stop current animation loop and reset the simulation.
          */
         stopAnimationLoop() {
+
+            if (!this.animationLoop) return;
+
             clearInterval(this.animationLoop);
             this.animationLoop = null;
+            BoidActor.resetBoidSim();
         }
 
     }

@@ -87,5 +87,20 @@ export function lerp(a, b, factor) {
 */
 export function random(scale) {
     return ((Math.random()*2)-1)*scale;
-    
+}
+
+/**
+ * Runs a function in isolation and prevents concurrent calls until done.
+ * @param {function} fn The function to run.
+ * @returns 
+ */
+export async function isolated(fn) {
+
+    if (sessionStorage.getItem('isolated-lock') === 'true') return;
+
+    sessionStorage.setItem('isolated-lock', true)
+    const result = await fn();
+    sessionStorage.setItem('isolated-lock', false)
+
+    return result
 }

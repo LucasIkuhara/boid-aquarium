@@ -7,21 +7,80 @@
             <i data-feather="settings"></i>
         </div>
     
-        <div v-show="!collapsed" class="menu-open">
+        <div v-show="!collapsed" class="menu-open" ref="menu" @focusout="close()" tabindex="0">
 
-            <div class="menu-button" v-on:click="toggle()">
-                <i data-feather="arrow-left"></i>
-            </div>
+            <header class="menu-header">
+                <div class="menu-button" v-on:click="toggle()">
+                    <i data-feather="arrow-left"></i>
+                </div>
+            </header>
 
-            <section class="boid-settings">
-                <ul>
-                    <li>
-                        <label for="boid-speed"> Boid Speed: </label>
-                        <input name="boid-speed" type="range" min="0" max="100" step="1" v-model="boids.boidSpeed"> 
-                        <input type="number" v-model="boids.boidSpeed"/>
-                    </li>
-                </ul>
-            </section>
+            <ul class="boid-settings">
+                <li class="option-row">
+                    <label class="option-label" for="boid-speed"> Speed: </label>
+                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="0.1" v-model="boids.boidSpeed"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.boidSpeed"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-turn-speed"> Turn Speed: </label>
+                    <input class="option-slider" name="boid-turn-speed" type="range" min="0" max="10" step="0.1" v-model="boids.turnSpeed"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.turnSpeed"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-randomness"> Randomness: </label>
+                    <input class="option-slider" name="boid-randomness" type="range" min="0" max="0.1" step="0.001" v-model="boids.randomness"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.randomness"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-too-far"> Maximum distance: </label>
+                    <input class="option-slider" name="boid-too-far" type="range" min="0" max="10" step="0.1" v-model="boids.tooFar"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.tooFar"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-too-close"> Minimum distance: </label>
+                    <input class="option-slider" name="boid-too-close" type="range" min="0" max="2" step="0.1" v-model="boids.tooClose"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.tooClose"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-viewing-range"> Viewing range: </label>
+                    <input class="option-slider" name="boid-viewing-range" type="range" min="0" max="50" step="0.1" v-model="boids.viewingRange"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.viewingRange"/>
+                </li>
+            </ul>
+
+            <ul class="boid-settings">
+                <li class="option-row">
+                    <label class="option-label" for="env-count"> Boid count: </label>
+                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="1" v-model="env.boidCountTarget"> 
+                    <input class="option-numeric-field" type="number" v-model="env.boidCountTarget"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-turn-speed"> Turn Speed: </label>
+                    <input class="option-slider" name="boid-turn-speed" type="range" min="0" max="10" step="0.1" v-model="boids.turnSpeed"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.turnSpeed"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-randomness"> Randomness: </label>
+                    <input class="option-slider" name="boid-randomness" type="range" min="0" max="0.1" step="0.001" v-model="boids.randomness"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.randomness"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-too-far"> Maximum distance: </label>
+                    <input class="option-slider" name="boid-too-far" type="range" min="0" max="10" step="0.1" v-model="boids.tooFar"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.tooFar"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-too-close"> Minimum distance: </label>
+                    <input class="option-slider" name="boid-too-close" type="range" min="0" max="2" step="0.1" v-model="boids.tooClose"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.tooClose"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="boid-viewing-range"> Viewing range: </label>
+                    <input class="option-slider" name="boid-viewing-range" type="range" min="0" max="50" step="0.1" v-model="boids.viewingRange"> 
+                    <input class="option-numeric-field" type="number" v-model="boids.viewingRange"/>
+                </li>
+            </ul>
+   
         </div>
 
     </section>

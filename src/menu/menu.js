@@ -47,6 +47,21 @@ export default {
 		 */
 		toggle() {
 			this.collapsed = !this.collapsed;
+
+			// if (!this.collapsed)
+			// {
+
+			// 	this.$refs.menu.focus();
+				
+			// 	console.log(document.activeElement)
+			// }
+		},
+
+		/**
+		 * Called upon clicking outside the modal.
+		 */
+		close() {
+			this.collapsed = true;
 		},
 
 		/**
@@ -77,7 +92,7 @@ export default {
 	},
 
 	watch: {
-		cfg: {
+		env: {
 			handler() {
 				this.emitSettings(this.appConfig);
 			},
