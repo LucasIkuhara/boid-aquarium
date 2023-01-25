@@ -1,5 +1,5 @@
 import { Painter } from "./painter.js"
-import { BoidActor } from "./actor.js"
+import { FlashingActor } from "./actor.js"
 
 /** Type imports
  * @typedef {import('./actor').BoidCfg} BoidCfg
@@ -34,7 +34,7 @@ export class BoidTank {
 
         this.boids = []
         for (let i=0; i<env.boidCountTarget; i++) {
-            this.boids.push(new BoidActor(env, cfg))
+            this.boids.push(new FlashingActor(env, cfg))
         }
     }
 

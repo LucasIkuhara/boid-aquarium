@@ -52,9 +52,9 @@ export class BoidActor {
         this.cfg = config;
 
         // Generate Boid ID and add to peers
-        BoidActor.boidCount++;
-        this._id = BoidActor.boidCount;
-        BoidActor.peers.push(this);
+        this.constructor.boidCount++;
+        this._id = this.constructor.boidCount;
+        this.constructor.peers.push(this);
 
         // ! refactor
         this.position = [
@@ -80,8 +80,8 @@ export class BoidActor {
     }
 
     static resetBoidSim() {
-        BoidActor.boidCount = 0;
-        BoidActor.peers = [];
+        this.constructor.boidCount = 0;
+        this.constructor.peers = [];
     }
 
     /**
@@ -131,7 +131,7 @@ export class BoidActor {
         const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
         
         // Compute the average position and heading of visible peers.
-        const avg = BoidActor.averagePeers(visiblePeers);
+        const avg = this.constructor.averagePeers(visiblePeers);
 
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
@@ -158,7 +158,7 @@ export class BoidActor {
      * @returns {BoidActor[]} An array of boids in range.
     */
    getVisiblePeers() {
-       return BoidActor.peers.filter(boid => {
+       return this.constructor.peers.filter(boid => {
            
            // Exclude itself
            if (boid._id === this._id) return false;
@@ -196,4 +196,8 @@ export class BoidActor {
 
         return avg;
     }
+}
+
+export class FlashingActor extends BoidActor {
+
 }
