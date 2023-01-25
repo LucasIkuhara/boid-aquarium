@@ -4,48 +4,60 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgba(0, 0, 0, 0.151);
 }
 
 .menu-button svg{
     padding: 5px;
-    stroke-width: 1px;
+    stroke-width: 2px;
+    color: var(--ui-main-color);
 }
 
 .menu-border {
     border-style: solid;
-    border-width: 1px;
+    border-width: 2px;
+    border-color: var(--ui-main-color);
     margin: 5px;
     display: flex;
 }
-
-.menu-header {
-    
+.menu-border:hover {
+    background-color: rgba(0, 0, 0, 0.151);
 }
 
 .menu-open {
+    background-color: rgba(0, 0, 0, 0.363);
     align-content: space-around;
     width: 50vw;
 }
 
 .boid-settings {
     display: flex;
+    align-items: stretch;
     flex-direction: column;
+    padding: 0px;
 }
 
 .option-row {
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 .option-label {
+    color: var(--ui-main-color);
+    text-align: left;
     flex-grow: 0;
     padding-left: 14px;
     padding-right: 14px;
-    width: 140px;
+    width: 170px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
 }
 
 .option-slider {
     flex-grow: 1;
+    accent-color: var(--ui-main-color);
+    height: 2px;
 }
 
 .option-numeric-field {
