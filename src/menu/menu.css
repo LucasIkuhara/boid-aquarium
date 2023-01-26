@@ -40,7 +40,7 @@
 .option-row {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    align-items: center;
 }
 
 .option-label {
@@ -62,7 +62,7 @@
 }
 
 .option-checkbox {
-    flex-grow: 1;
+    flex-grow: 0;
     accent-color: var(--ui-main-color);
 }
 

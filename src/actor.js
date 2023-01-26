@@ -31,6 +31,9 @@ import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
  * @property {number} minBrightness The minimum intensity of each blink (from 0 to 1).
  * @property {number} accumulationRate The amount of excitement increase of each boid in isolation per second.
  * @property {number} empathyFactor The amount of excitement gained when observing a peer blink.
+ * @property {number} colorSaturation The saturation of the blinking color from (from 0 to 100).
+ * @property {number} colorAccumulationRate The amount of change in color per second in isolation.
+ * @property {number} colorEmpathyFactor The amount of excitement gained when observing a peer complete a color circle.
  */
 
 /**
@@ -223,37 +226,53 @@ export class BlinkingActor extends BoidActor {
         super(environment, config);
 
         this.blinkCfg = blinkCfg;
-        this._phase = Math.random()*360;
-        this._excitement = Math.random();
-        this._blinkedLastStep = false;
+        this.phase = Math.random()*360;
+        this.excitement = Math.random();
     }
 
     act() {
         super.act();
-        this._excitement = this.computeExcitement();
+        this.excitement = this.computeExcitement();
+        this.phase = this.computeColorPhase();
+    }
+
+    computeColorPhase() {
+
+        // If the boid just blinked, reset gradient
+        if (this.phase > 360) return 0;
+
+        // Passive isolated color change
+        let phase = this.phase + this.env.timeStepInSecs * this.blinkCfg.colorAccumulationRate;
+
+        // Empathetic color change
+        this.visiblePeers.forEach(peer => {
+            if (peer.phase > 360 - this.blinkCfg.colorEmpathyFactor) 
+                phase = phase + this.blinkCfg.colorEmpathyFactor;
+        })
+
+        return phase;
     }
 
     computeExcitement() {
 
         // If the boid just blinked, reset gradient
-        if (this._blinkedLastStep) {
-            this._blinkedLastStep = false;
-            return 0;
-        }
+        if (this.excitement > 1) return 0;
 
-        let excitement = this._excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
+        // Passive isolated excitement growth
+        let excitement = this.excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
 
-        // If excitement is larger than 1, it will blink this step, and thus
-        // should have its gradient reset next step
-        if(excitement > 1)
-            this._blinkedLastStep = true;
+        // Empathetic excitement growth
+        this.visiblePeers.forEach(peer => {
+            if (peer.excitement > 1 - this.blinkCfg.empathyFactor) 
+                excitement += this.blinkCfg.empathyFactor;
+        })
 
         return excitement;
     }
 
     get emission() {
         return {
-            color: new THREE.Color(`hsl(${this._phase*360}, 100%, 50%)`),
+            color: new THREE.Color(`hsl(${this.phase}, ${this.blinkCfg.colorSaturation}%, 50%)`),
             intensity: this.computeIntensity()
         }
     }
@@ -263,9 +282,9 @@ export class BlinkingActor extends BoidActor {
      */
     computeIntensity() {
 
-        const val = this._excitement < 0.5 ?
-        Math.pow(this._excitement + 0.5, 6) :
-        Math.pow(this._excitement - 1.5, 6)
+        const val = this.excitement < 0.5 ?
+        Math.pow(this.excitement + 0.5, 6) :
+        Math.pow(this.excitement - 1.5, 6)
 
         // Ensure intensity is in the [minBrightness, maxBrightness] interval
         const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);

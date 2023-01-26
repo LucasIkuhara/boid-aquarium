@@ -41,9 +41,12 @@ export default {
 
 			blink: {
 				maxBrightness: 1.0,
-				minBrightness: 0.0,
+				minBrightness: 0.15,
 				accumulationRate: 1.0,
-				empathyFactor: 0.33
+				empathyFactor: 0.2,
+				colorSaturation: 30,
+				colorAccumulationRate: 5,
+				colorEmpathyFactor: 40
 			},
 
 			collapsed: true
@@ -95,9 +98,9 @@ export default {
 				env: {
 					...this.env,
 					tankSize: [
-						Number(this.env.dimensions.x),
-						Number(this.env.dimensions.y),
-						Number(this.env.dimensions.z),
+						this.env.dimensions.x,
+						this.env.dimensions.y,
+						this.env.dimensions.z,
 					],
                     timeStepInSecs: 1/this.fpsTarget,
 				},
