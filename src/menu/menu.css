@@ -40,7 +40,7 @@
 .option-row {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    align-items: center;
 }
 
 .option-label {
@@ -49,15 +49,21 @@
     flex-grow: 0;
     padding-left: 14px;
     padding-right: 14px;
-    width: 170px;
+    width: 220px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: 600;
 }
 
 .option-slider {
+    padding-left: 14px;
     flex-grow: 1;
     accent-color: var(--ui-main-color);
     height: 2px;
+}
+
+.option-checkbox {
+    flex-grow: 0;
+    accent-color: var(--ui-main-color);
 }
 
 .option-numeric-field {

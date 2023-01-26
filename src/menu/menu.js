@@ -3,6 +3,7 @@
 * @typedef {object} AppCfg
 * @property {import("../actor").BoidCfg} boids The boid behavior settings.
 * @property {import("../tank").EnvConfig} env The boid environment settings.
+* @property {import("../actor").BlinkCfg} blink The boid blinking behavior settings.
 * @property {number} fpsTarget The target number of frames that should be drawn in a second.
 */
 
@@ -25,6 +26,7 @@ export default {
 					y: window.innerHeight/100, 
 					z: window.innerWidth/100
 				},
+				useBlinking: true
 			},
 
 			// Boid Settings
@@ -36,6 +38,17 @@ export default {
 				turnSpeed: 5,
 				boidSpeed: 5
 			},
+
+			blink: {
+				maxBrightness: 1.0,
+				minBrightness: 0.15,
+				accumulationRate: 0.2,
+				empathyFactor: 0.2,
+				colorSaturation: 30,
+				colorAccumulationRate: 5,
+				colorEmpathyFactor: 40
+			},
+
 			collapsed: true
 		}
 	},
@@ -85,12 +98,13 @@ export default {
 				env: {
 					...this.env,
 					tankSize: [
-						Number(this.env.dimensions.x),
-						Number(this.env.dimensions.y),
-						Number(this.env.dimensions.z),
+						this.env.dimensions.x,
+						this.env.dimensions.y,
+						this.env.dimensions.z,
 					],
                     timeStepInSecs: 1/this.fpsTarget,
 				},
+				blink: this.blink,
 				fpsTarget: this.fpsTarget
 			}
 		}

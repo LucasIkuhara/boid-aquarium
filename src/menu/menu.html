@@ -18,57 +18,100 @@
             <ul class="boid-settings">
                 <li class="option-row">
                     <label class="option-label" for="boid-speed"> Speed: </label>
-                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="0.1" v-model="boids.boidSpeed"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.boidSpeed"/>
+                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="0.1" v-model.number="boids.boidSpeed"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.boidSpeed"/>
                 </li>
                 <li class="option-row">
                     <label class="option-label" for="boid-turn-speed"> Turn Speed: </label>
-                    <input class="option-slider" name="boid-turn-speed" type="range" min="0" max="10" step="0.1" v-model="boids.turnSpeed"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.turnSpeed"/>
+                    <input class="option-slider" name="boid-turn-speed" type="range" min="0" max="10" step="0.1" v-model.number="boids.turnSpeed"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.turnSpeed"/>
                 </li>
                 <li class="option-row">
                     <label class="option-label" for="boid-randomness"> Randomness: </label>
-                    <input class="option-slider" name="boid-randomness" type="range" min="0" max="0.1" step="0.001" v-model="boids.randomness"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.randomness"/>
+                    <input class="option-slider" name="boid-randomness" type="range" min="0" max="0.1" step="0.001" v-model.number="boids.randomness"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.randomness"/>
                 </li>
                 <li class="option-row">
                     <label class="option-label" for="boid-too-far"> Maximum distance: </label>
-                    <input class="option-slider" name="boid-too-far" type="range" min="0" max="10" step="0.1" v-model="boids.tooFar"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.tooFar"/>
+                    <input class="option-slider" name="boid-too-far" type="range" min="0" max="10" step="0.1" v-model.number="boids.tooFar"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.tooFar"/>
                 </li>
                 <li class="option-row">
                     <label class="option-label" for="boid-too-close"> Minimum distance: </label>
-                    <input class="option-slider" name="boid-too-close" type="range" min="0" max="2" step="0.1" v-model="boids.tooClose"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.tooClose"/>
+                    <input class="option-slider" name="boid-too-close" type="range" min="0" max="2" step="0.1" v-model.number="boids.tooClose"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.tooClose"/>
                 </li>
                 <li class="option-row">
                     <label class="option-label" for="boid-viewing-range"> Viewing range: </label>
-                    <input class="option-slider" name="boid-viewing-range" type="range" min="0" max="50" step="0.1" v-model="boids.viewingRange"> 
-                    <input class="option-numeric-field" type="number" v-model="boids.viewingRange"/>
+                    <input class="option-slider" name="boid-viewing-range" type="range" min="0" max="50" step="0.1" v-model.number="boids.viewingRange"> 
+                    <input class="option-numeric-field" type="number" v-model.number="boids.viewingRange"/>
                 </li>
             </ul>
 
             <ul class="boid-settings">
                 <li class="option-row">
                     <label class="option-label" for="env-count"> Boid count: </label>
-                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="1" v-model="env.boidCountTarget"> 
-                    <input class="option-numeric-field" type="number" v-model="env.boidCountTarget"/>
+                    <input class="option-slider" name="boid-speed" type="range" min="0" max="100" step="1" v-model.number="env.boidCountTarget"> 
+                    <input class="option-numeric-field" type="number" v-model.number="env.boidCountTarget"/>
                 </li>
                 <li class="option-row">
-                    <label class="option-label" for="boid-turn-speed"> Tank width: </label>
-                    <input class="option-slider" name="boid-turn-speed" type="range" min="5" max="25" step="0.1" v-model="env.dimensions.x"> 
-                    <input class="option-numeric-field" type="number" v-model="env.dimensions.x"/>
+                    <label class="option-label" for="env-width"> Tank width: </label>
+                    <input class="option-slider" name="env-width" type="range" min="5" max="25" step="0.1" v-model.number="env.dimensions.x"> 
+                    <input class="option-numeric-field" type="number" v-model.number="env.dimensions.x"/>
                 </li>
                 <li class="option-row">
-                    <label class="option-label" for="boid-randomness"> Tank length: </label>
-                    <input class="option-slider" name="boid-randomness" type="range" min="5" max="25" step="0.1" v-model="env.dimensions.z"> 
-                    <input class="option-numeric-field" type="number" v-model="env.dimensions.z"/>
+                    <label class="option-label" for="env-length"> Tank length: </label>
+                    <input class="option-slider" name="env-length" type="range" min="5" max="25" step="0.1" v-model.number="env.dimensions.z"> 
+                    <input class="option-numeric-field" type="number" v-model.number="env.dimensions.z"/>
                 </li>
                 <li class="option-row">
-                    <label class="option-label" for="boid-too-far"> Tank depth: </label>
-                    <input class="option-slider" name="boid-too-far" type="range" min="5" max="25" step="0.1" v-model="env.dimensions.y"> 
-                    <input class="option-numeric-field" type="number" v-model="env.dimensions.y"/>
+                    <label class="option-label" for="env-depth"> Tank depth: </label>
+                    <input class="option-slider" name="env-depth" type="range" min="5" max="25" step="0.1" v-model.number="env.dimensions.y"> 
+                    <input class="option-numeric-field" type="number" v-model.number="env.dimensions.y"/>
                 </li>
+            </ul>
+
+            <ul class="boid-settings">
+                <li class="option-row">
+                    <label class="option-label" for="blink-enable"> Blinking boids: </label>
+                    <input class="option-checkbox" name="blink-enable" type="checkbox" v-model="env.useBlinking"> 
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="blink-max-brightness"> Maximum brightness: </label>
+                    <input class="option-slider" name="blink-max-brightness" type="range" min="0" max="1" step="0.01" v-model.number="blink.maxBrightness"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.maxBrightness"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="blink-min-brightness"> Minimum brightness: </label>
+                    <input class="option-slider" name="blink-min-brightness" type="range" min="0" max="1" step="0.01" v-model.number="blink.minBrightness"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.minBrightness"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="blink-accumulation-rate"> Excitement per second: </label>
+                    <input class="option-slider" name="blink-accumulation-rate" type="range" min="0" max="4" step="0.01" v-model.number="blink.accumulationRate"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.accumulationRate"/>
+                </li>       
+                <li class="option-row">
+                    <label class="option-label" for="blink-empathy-factor"> Blink empathy: </label>
+                    <input class="option-slider" name="blink-empathy-factor" type="range" min="0" max="4" step="0.01" v-model.number="blink.empathyFactor"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.empathyFactor"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="blink-color-saturation"> Color saturation: </label>
+                    <input class="option-slider" name="blink-color-saturation" type="range" min="0" max="100" step="0.1" v-model.number="blink.colorSaturation"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.colorSaturation"/>
+                </li>  
+                <li class="option-row">
+                    <label class="option-label" for="blink-color-accumulation-rate"> Color per second: </label>
+                    <input class="option-slider" name="blink-color-accumulation-rate" type="range" min="0" max="360" step="1" v-model.number="blink.colorAccumulationRate"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.colorAccumulationRate"/>
+                </li>
+                <li class="option-row">
+                    <label class="option-label" for="blink-color-empathy-factor"> Color empathy: </label>
+                    <input class="option-slider" name="blink-color-empathy-factor" type="range" min="0" max="360" step="1" v-model.number="blink.colorEmpathyFactor"> 
+                    <input class="option-numeric-field" type="number" v-model.number="blink.colorEmpathyFactor"/>
+                </li>
+
             </ul>
    
         </div>

@@ -65,9 +65,6 @@ export class Painter {
 	 */
 	setupScene(boids, env) {
 
-		// Boid material
-		const material = new THREE.MeshPhongMaterial({});
-
 		// Add lights
 		this.scene.add(new THREE.DirectionalLight());
 		this.scene.add(new THREE.AmbientLight("rgb(187, 239, 255)", 0.3));
@@ -81,6 +78,7 @@ export class Painter {
 		// Create an Object3D and add it to the scene for each boidActor
 		boids.forEach(boid => {
 
+			const material = new THREE.MeshPhongMaterial({});
 			const boidObj =  new THREE.Mesh(this.boidModel, material);
 
 			// Required for allowing manual pose updates
@@ -115,6 +113,13 @@ export class Painter {
 		boids.forEach(actor => {
 			const obj = this.boidObjs.get(actor._id);
 			obj.matrix = actorToModel(actor);
+
+			// Update colors in case of flashing boids
+			let emission = actor.emission;
+			if (emission) {
+				obj.material.emissive = emission.color
+				obj.material.emissiveIntensity = emission.intensity
+			}
 		})
 
 		// Render a new frame

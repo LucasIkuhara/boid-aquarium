@@ -52,7 +52,7 @@ Vue.createApp({
             const camController = new CameraController('webgl-canvas');
             const painter = new Painter('webgl-canvas', camController);
             await painter.loadModels();
-            const tank = new BoidTank(painter, cfg.env, cfg.boids);
+            const tank = new BoidTank(painter, cfg.env, cfg.boids, cfg.blink);
 
             // Start animation loop
             this.animationLoop = setInterval(() => {

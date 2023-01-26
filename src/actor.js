@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 const vec3 = glMatrix.vec3;
 import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
 
@@ -24,6 +25,18 @@ import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
  */
 
 /**
+ * Defines the behavior of the blinking in a blinking boid.
+ * @typedef {object} BlinkCfg
+ * @property {number} maxBrightness The maximum intensity of each blink (from 0 to 1).
+ * @property {number} minBrightness The minimum intensity of each blink (from 0 to 1).
+ * @property {number} accumulationRate The amount of excitement increase of each boid in isolation per second.
+ * @property {number} empathyFactor The amount of excitement gained when observing a peer blink.
+ * @property {number} colorSaturation The saturation of the blinking color from (from 0 to 100).
+ * @property {number} colorAccumulationRate The amount of change in color per second in isolation.
+ * @property {number} colorEmpathyFactor The amount of excitement gained when observing a peer complete a color circle.
+ */
+
+/**
  * Represents an agent that follows Boid behavior.
  * Each boid has the capability to turn itself, to move forward and to look for peers
  * in a given range. Following a simple rule set, each boid decides alone on its actions, 
@@ -42,7 +55,7 @@ export class BoidActor {
     /**
      * Creates a new BoidActor.
      * @constructor
-     * @param {EnvConfig} environment The settings of the environment the boid is in.
+     * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
      * @param {BoidCfg} config The parameters for boid decision-making.
      */
     constructor(environment, config) {
@@ -52,9 +65,10 @@ export class BoidActor {
         this.cfg = config;
 
         // Generate Boid ID and add to peers
-        BoidActor.boidCount++;
-        this._id = BoidActor.boidCount;
-        BoidActor.peers.push(this);
+        this.constructor.boidCount++;
+        this._id = this.constructor.boidCount;
+        this.constructor.peers.push(this);
+        this.visiblePeers = [];
 
         // ! refactor
         this.position = [
@@ -80,14 +94,15 @@ export class BoidActor {
     }
 
     static resetBoidSim() {
-        BoidActor.boidCount = 0;
-        BoidActor.peers = [];
+        this.constructor.boidCount = 0;
+        this.constructor.peers = [];
     }
 
     /**
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
     act() {
+        this.visiblePeers = this.getVisiblePeers();
         const orientation = this.computeOrientation();
         this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
         this.position = this.computePosition();
@@ -123,15 +138,14 @@ export class BoidActor {
     computeOrientation() {
 
         // Get all visible neighbors. If there aren't any, keep current course.
-        const visiblePeers = this.getVisiblePeers();
-        if (visiblePeers.length < 1)  return this.orientation
+        if (this.visiblePeers.length < 1)  return this.orientation
 
         // If there are visible peers, compute new orientation based on them.
         let newOrientation = { axis: null, angle: this.orientation.angle };
         const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
-        
+
         // Compute the average position and heading of visible peers.
-        const avg = BoidActor.averagePeers(visiblePeers);
+        const avg = this.constructor.averagePeers(this.visiblePeers);
 
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
@@ -157,13 +171,14 @@ export class BoidActor {
      * Returns the list of boids that are in visible range of the actor, excluding itself.
      * @returns {BoidActor[]} An array of boids in range.
     */
-   getVisiblePeers() {
-       return BoidActor.peers.filter(boid => {
+    getVisiblePeers() {
+
+        return this.constructor.peers.filter(boid => {
            
-           // Exclude itself
-           if (boid._id === this._id) return false;
-           
-           return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
+            // Exclude itself
+            if (boid._id === this._id) return false;
+            
+            return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
         })
     }
 
@@ -195,5 +210,112 @@ export class BoidActor {
         };
 
         return avg;
+    }
+}
+
+/**
+ * A variant of @type {BoidActor}, which behaves like the original, but has the additional
+ * capability to blink in different colors. Boids of this type tend to blink together in the same
+ * color as peers if exposed to them long enough.
+ */
+export class BlinkingActor extends BoidActor {
+
+    /**
+     * Creates a new BlinkingActor.
+     * @constructor
+     * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
+     * @param {BoidCfg} config The parameters for boid decision-making.
+     * @param {BlinkCfg} blinkCfg The parameters for boid blinking behavior.
+     */
+    constructor(environment, config, blinkCfg) {
+        super(environment, config);
+
+        this.blinkCfg = blinkCfg;
+        this.phase = Math.random()*360;
+        this.excitement = Math.random();
+    }
+
+    /**
+     * Compute the normal behavior of a @type {BoidActor}, with some additional
+     * distributed color matching logic. Boids should sync their color and blink timings
+     * by observing others. Seeing a peer blink (or change colors) increases the urge of
+     * a @type {BlinkingBoid} to do so, generating the emergent behavior of synchrony.
+     */
+    act() {
+        super.act();
+        this.excitement = this.computeExcitement();
+        this.phase = this.computeColorPhase();
+    }
+
+    /**
+     * Computes the color of the boid's light emissions based on time passage and peers.
+     * The phase increases with time and also upon seeing other boids reset their phase (ie. seeing a boid
+     * with a phase value critically close to 360, with the definition of criticality depending on the 
+     * colorEmpathyFactor). If the phase exceeds 360, it will be reset in the next simulation step.
+     * @returns {number} The degree component of an HSL color.
+     */
+    computeColorPhase() {
+
+        // If the boid just blinked, reset gradient
+        if (this.phase > 360) return 0;
+
+        // Passive isolated color change
+        let phase = this.phase + this.env.timeStepInSecs * this.blinkCfg.colorAccumulationRate;
+
+        // Empathetic color change
+        this.visiblePeers.forEach(peer => {
+            if (peer.phase > 360 - this.blinkCfg.colorEmpathyFactor) 
+                phase = phase + this.blinkCfg.colorEmpathyFactor;
+        })
+
+        return phase;
+    }
+
+    /**
+     * Calculate the excitement gradient of the boid, which controls blinking.
+     * The boid's excitement is visible to peers once the gradient is critically close to 1
+     * (less than the value of empathyFactor away). If the gradient exceeds 1, it will reset
+     * next step.
+     * @returns {number} The new excitement gradient value based on time passage and peers.
+     */
+    computeExcitement() {
+
+        // If the boid just blinked, reset gradient
+        if (this.excitement > 1) return 0;
+
+        // Passive isolated excitement growth
+        let excitement = this.excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
+
+        // Empathetic excitement growth
+        this.visiblePeers.forEach(peer => {
+            if (peer.excitement > 1 - this.blinkCfg.empathyFactor) 
+                excitement += this.blinkCfg.empathyFactor;
+        })
+
+        return excitement;
+    }
+
+    /**
+     * The parameters of light emission from the blinking boid.
+     */
+    get emission() {
+        return {
+            color: new THREE.Color(`hsl(${this.phase}, ${this.blinkCfg.colorSaturation}%, 50%)`),
+            intensity: this.computeIntensity()
+        }
+    }
+
+    /**
+     * Applies a function to convert excitement into blinking brightness.
+     */
+    computeIntensity() {
+
+        const val = this.excitement < 0.5 ?
+        Math.pow(this.excitement + 0.5, 6) :
+        Math.pow(this.excitement - 1.5, 6)
+
+        // Ensure intensity is in the [minBrightness, maxBrightness] interval
+        const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);
+        return normalized;
     }
 }
