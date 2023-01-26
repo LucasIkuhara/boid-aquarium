@@ -1,17 +1,15 @@
 import { Painter } from "./painter.js"
-import { FlashingActor } from "./actor.js"
+import { BlinkingActor, BoidActor } from "./actor.js"
 
-/** Type imports
- * @typedef {import('./actor').BoidCfg} BoidCfg
- */
 
 /**
  * Represents the settings of the environment in which the boids are placed in.
  * @typedef {object} EnvConfig
- * @property {number[3]} tankSize Depicts the dimensions of the environment as number[] of length 3.
+ * @property {number[]} tankSize Depicts the dimensions of the environment as number[] of length 3.
  * @property {number} timeStepInSecs The size of simulation steps in seconds (ex: 0.2s per step).
  * @property {number} boidCountTarget The desired amount of boids in the tank.
  * @property {boolean} is2dSpace Indicates wether or not the boids should be simulated in 2D.
+ * @property {boolean} useBlinking Indicates wether or not the boids be blinking boids.
  */
 
 
@@ -22,10 +20,11 @@ export class BoidTank {
      * @constructor
      * @param {Painter} painter A Painter object.
      * @param {EnvConfig} env The tank environment settings.
-     * @param {BoidCfg} cfg The parameters for boid creation.
+     * @param {import('./actor').BoidCfg} cfg The parameters for boid creation.
+     * @param {import('./actor').BlinkCfg} blinkCfg The parameters for blinking boid creation.
      * @param {boolean} debug Enable debugging logs.
      */
-    constructor(painter, env, cfg, debug=false) {
+    constructor(painter, env, cfg, blinkCfg, debug=false) {
 
         this.env = env;
         this.painter = painter;
@@ -34,7 +33,11 @@ export class BoidTank {
 
         this.boids = []
         for (let i=0; i<env.boidCountTarget; i++) {
-            this.boids.push(new FlashingActor(env, cfg))
+            this.boids.push(
+                env.useBlinking ?
+                new BlinkingActor(env, cfg, blinkCfg) :
+                new BoidActor(env, cfg)
+            )
         }
     }
 

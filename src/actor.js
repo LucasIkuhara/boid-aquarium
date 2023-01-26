@@ -28,6 +28,7 @@ import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
  * Defines the behavior of the blinking in a blinking boid.
  * @typedef {object} BlinkCfg
  * @property {number} maxBrightness The maximum intensity of each blink (from 0 to 1).
+ * @property {number} minBrightness The minimum intensity of each blink (from 0 to 1).
  * @property {number} accumulationRate The amount of excitement increase of each boid in isolation per second.
  * @property {number} empathyFactor The amount of excitement gained when observing a peer blink.
  */
@@ -209,11 +210,19 @@ export class BoidActor {
     }
 }
 
-export class FlashingActor extends BoidActor {
+export class BlinkingActor extends BoidActor {
 
-    constructor(environment, config) {
+    /**
+     * Creates a new BlinkingActor.
+     * @constructor
+     * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
+     * @param {BoidCfg} config The parameters for boid decision-making.
+     * @param {BlinkCfg} blinkCfg The parameters for boid blinking behavior.
+     */
+    constructor(environment, config, blinkCfg) {
         super(environment, config);
 
+        this.blinkCfg = blinkCfg;
         this._phase = Math.random()*360;
         this._excitement = Math.random();
         this._blinkedLastStep = false;
@@ -232,7 +241,7 @@ export class FlashingActor extends BoidActor {
             return 0;
         }
 
-        let excitement = this._excitement + this.env.timeStepInSecs * 1;
+        let excitement = this._excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
 
         // If excitement is larger than 1, it will blink this step, and thus
         // should have its gradient reset next step
@@ -254,9 +263,12 @@ export class FlashingActor extends BoidActor {
      */
     computeIntensity() {
 
-        const val = Math.pow(this._excitement, 20);
+        const val = this._excitement < 0.5 ?
+        Math.pow(this._excitement + 0.5, 6) :
+        Math.pow(this._excitement - 1.5, 6)
 
-        const normalized = Math.max(Math.min(val, 1), 0);
+        // Ensure intensity is in the [minBrightness, maxBrightness] interval
+        const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);
         return normalized;
     }
 }
