@@ -25,6 +25,14 @@ import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
  */
 
 /**
+ * Defines the behavior of the blinking in a blinking boid.
+ * @typedef {object} BlinkCfg
+ * @property {number} maxBrightness The maximum intensity of each blink (from 0 to 1).
+ * @property {number} accumulationRate The amount of excitement increase of each boid in isolation per second.
+ * @property {number} empathyFactor The amount of excitement gained when observing a peer blink.
+ */
+
+/**
  * Represents an agent that follows Boid behavior.
  * Each boid has the capability to turn itself, to move forward and to look for peers
  * in a given range. Following a simple rule set, each boid decides alone on its actions, 
@@ -43,7 +51,7 @@ export class BoidActor {
     /**
      * Creates a new BoidActor.
      * @constructor
-     * @param {EnvConfig} environment The settings of the environment the boid is in.
+     * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
      * @param {BoidCfg} config The parameters for boid decision-making.
      */
     constructor(environment, config) {
@@ -56,6 +64,7 @@ export class BoidActor {
         this.constructor.boidCount++;
         this._id = this.constructor.boidCount;
         this.constructor.peers.push(this);
+        this.visiblePeers = [];
 
         // ! refactor
         this.position = [
@@ -89,6 +98,7 @@ export class BoidActor {
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
     act() {
+        this.visiblePeers = this.getVisiblePeers();
         const orientation = this.computeOrientation();
         this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
         this.position = this.computePosition();
@@ -124,15 +134,14 @@ export class BoidActor {
     computeOrientation() {
 
         // Get all visible neighbors. If there aren't any, keep current course.
-        const visiblePeers = this.getVisiblePeers();
-        if (visiblePeers.length < 1)  return this.orientation
+        if (this.visiblePeers.length < 1)  return this.orientation
 
         // If there are visible peers, compute new orientation based on them.
         let newOrientation = { axis: null, angle: this.orientation.angle };
         const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
-        
+
         // Compute the average position and heading of visible peers.
-        const avg = this.constructor.averagePeers(visiblePeers);
+        const avg = this.constructor.averagePeers(this.visiblePeers);
 
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
@@ -158,13 +167,14 @@ export class BoidActor {
      * Returns the list of boids that are in visible range of the actor, excluding itself.
      * @returns {BoidActor[]} An array of boids in range.
     */
-   getVisiblePeers() {
-       return this.constructor.peers.filter(boid => {
+    getVisiblePeers() {
+
+        return this.constructor.peers.filter(boid => {
            
-           // Exclude itself
-           if (boid._id === this._id) return false;
-           
-           return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
+            // Exclude itself
+            if (boid._id === this._id) return false;
+            
+            return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
         })
     }
 
@@ -204,13 +214,49 @@ export class FlashingActor extends BoidActor {
     constructor(environment, config) {
         super(environment, config);
 
-        this.phase = 2
+        this._phase = Math.random()*360;
+        this._excitement = Math.random();
+        this._blinkedLastStep = false;
+    }
+
+    act() {
+        super.act();
+        this._excitement = this.computeExcitement();
+    }
+
+    computeExcitement() {
+
+        // If the boid just blinked, reset gradient
+        if (this._blinkedLastStep) {
+            this._blinkedLastStep = false;
+            return 0;
+        }
+
+        let excitement = this._excitement + this.env.timeStepInSecs * 1;
+
+        // If excitement is larger than 1, it will blink this step, and thus
+        // should have its gradient reset next step
+        if(excitement > 1)
+            this._blinkedLastStep = true;
+
+        return excitement;
     }
 
     get emission() {
         return {
-            color: new THREE.Color(`hsl(${Math.random()*360}, 100%, 50%)`),
-            intensity: Math.random()
+            color: new THREE.Color(`hsl(${this._phase*360}, 100%, 50%)`),
+            intensity: this.computeIntensity()
         }
+    }
+
+    /**
+     * Applies a function to convert excitement into blinking brightness.
+     */
+    computeIntensity() {
+
+        const val = Math.pow(this._excitement, 20);
+
+        const normalized = Math.max(Math.min(val, 1), 0);
+        return normalized;
     }
 }
