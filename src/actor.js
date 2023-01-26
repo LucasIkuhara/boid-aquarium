@@ -213,6 +213,11 @@ export class BoidActor {
     }
 }
 
+/**
+ * A variant of @type {BoidActor}, which behaves like the original, but has the additional
+ * capability to blink in different colors. Boids of this type tend to blink together in the same
+ * color as peers if exposed to them long enough.
+ */
 export class BlinkingActor extends BoidActor {
 
     /**
@@ -230,12 +235,25 @@ export class BlinkingActor extends BoidActor {
         this.excitement = Math.random();
     }
 
+    /**
+     * Compute the normal behavior of a @type {BoidActor}, with some additional
+     * distributed color matching logic. Boids should sync their color and blink timings
+     * by observing others. Seeing a peer blink (or change colors) increases the urge of
+     * a @type {BlinkingBoid} to do so, generating the emergent behavior of synchrony.
+     */
     act() {
         super.act();
         this.excitement = this.computeExcitement();
         this.phase = this.computeColorPhase();
     }
 
+    /**
+     * Computes the color of the boid's light emissions based on time passage and peers.
+     * The phase increases with time and also upon seeing other boids reset their phase (ie. seeing a boid
+     * with a phase value critically close to 360, with the definition of criticality depending on the 
+     * colorEmpathyFactor). If the phase exceeds 360, it will be reset in the next simulation step.
+     * @returns {number} The degree component of an HSL color.
+     */
     computeColorPhase() {
 
         // If the boid just blinked, reset gradient
@@ -253,6 +271,13 @@ export class BlinkingActor extends BoidActor {
         return phase;
     }
 
+    /**
+     * Calculate the excitement gradient of the boid, which controls blinking.
+     * The boid's excitement is visible to peers once the gradient is critically close to 1
+     * (less than the value of empathyFactor away). If the gradient exceeds 1, it will reset
+     * next step.
+     * @returns {number} The new excitement gradient value based on time passage and peers.
+     */
     computeExcitement() {
 
         // If the boid just blinked, reset gradient
@@ -270,6 +295,9 @@ export class BlinkingActor extends BoidActor {
         return excitement;
     }
 
+    /**
+     * The parameters of light emission from the blinking boid.
+     */
     get emission() {
         return {
             color: new THREE.Color(`hsl(${this.phase}, ${this.blinkCfg.colorSaturation}%, 50%)`),

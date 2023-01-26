@@ -42,7 +42,7 @@ export default {
 			blink: {
 				maxBrightness: 1.0,
 				minBrightness: 0.15,
-				accumulationRate: 1.0,
+				accumulationRate: 0.2,
 				empathyFactor: 0.2,
 				colorSaturation: 30,
 				colorAccumulationRate: 5,

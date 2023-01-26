@@ -11,13 +11,18 @@ export class CameraController {
 
         // Camera configuration
         this.angle = 0;
-        this.radius = 30;
+        const verticalFov = 45;
         this.clickPos = null;
         this.rSense = radialSensitivity;
         this.tSense = tangentSensitivity;
 
+        // Compute distance so the aquarium always fit the screen vertically, with an arc of theta of leeway
+        // above and below. This is basic trigonometry using the size of the aquarium derived from the window size.
+        const theta = 3;
+        this.radius = (window.innerHeight / 100) / Math.tan((verticalFov/2 - theta)*Math.PI/180) + (window.innerWidth / 100);
+
         // Create THREE.js Camera
-        this._camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.001, 100);
+        this._camera = new THREE.PerspectiveCamera(verticalFov, window.innerWidth/window.innerHeight, 0.001, 100);
         this.updateCameraObject()
 
         // Start tracking mouse clicks and drags
