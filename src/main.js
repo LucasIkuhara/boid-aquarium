@@ -2,7 +2,7 @@ import { Painter } from './painter.js'
 import { BoidTank } from './tank.js'
 import { CameraController } from './camera.js'
 import SettingsMenu from './menu/menu.js'
-import { BoidActor } from './actor.js'
+import { resetBoids } from './actor.js'
 import { isolated } from './utils.js'
 
 
@@ -70,7 +70,7 @@ Vue.createApp({
 
             clearInterval(this.animationLoop);
             this.animationLoop = null;
-            BoidActor.resetBoidSim();
+            resetBoids();
         }
 
     }

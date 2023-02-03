@@ -123,8 +123,13 @@ export class BoidActor {
 
         // Make the boids bounce back, in case they are escaping the tank
         pos.forEach((val, index) => {
-            if (Math.abs(val) > this.env.tankSize[index]) 
-                this.orientation.axis[index] = -this.orientation.axis[index];
+
+            if (val > this.env.tankSize[index]) 
+                this.orientation.axis[index] = -Math.abs(this.orientation.axis[index]);
+
+            else if (val < -this.env.tankSize[index])
+                this.orientation.axis[index] = Math.abs(this.orientation.axis[index]);
+
         });
 
         return pos;
@@ -150,23 +155,24 @@ export class BoidActor {
         const boidToPeers = vec3.subtract([], avg.position, this.position);
         const distance = vec3.len(boidToPeers);
 
+        // Aggregation, Separation and Cohesion behaviors
         // Move closer
-        if (distance < this.cfg.tooClose)
-            newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.inverse([], boidToPeers), turnRate);
+        if (distance < this.cfg.tooClose) 
+            newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.negate([], boidToPeers), turnRate);
 
         // Move farther
-        if (distance > this.cfg.tooFar)
-            newOrientation.axis = vec3.lerp([], this.orientation.axis, boidToPeers, turnRate);
+        else if (distance > this.cfg.tooFar) 
+            newOrientation.axis = boidToPeers
 
         // Move alongside
         else {
-            newOrientation.axis = vec3.lerp([], this.orientation.axis, avg.orientation.axis, turnRate);
-            newOrientation.angle = lerp(this.orientation.angle, avg.orientation.angle, turnRate);
+            newOrientation.axis = avg.orientation.axis  
+            newOrientation.angle =  avg.orientation.angle   
         }
 
         return newOrientation;
     } 
-    
+
     /**
      * Returns the list of boids that are in visible range of the actor, excluding itself.
      * @returns {BoidActor[]} An array of boids in range.
@@ -318,4 +324,13 @@ export class BlinkingActor extends BoidActor {
         const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);
         return normalized;
     }
+}
+
+/**
+ * Resets static properties in Boid Species, allowing the simulation
+ * to be restarted.
+ */
+export function resetBoids() {
+    BoidActor.resetBoidSim();
+    BlinkingActor.resetBoidSim();
 }

@@ -19,7 +19,7 @@ export default {
 
 			// Environment Settings
 			env: {
-				boidCountTarget: 50,
+				boidCountTarget: 70,
 				is2dSpace: false,
 				dimensions: {
 					x: window.innerWidth/100, 
@@ -31,11 +31,11 @@ export default {
 
 			// Boid Settings
 			boids: {
-				viewingRange: 1.5,
-				tooClose: 0.9,
-				tooFar: 1.3,
+				viewingRange: 1.8,
+				tooClose: 1.1,
+				tooFar: 1.6,
 				randomness: 0.02,
-				turnSpeed: 5,
+				turnSpeed: 150,
 				boidSpeed: 5
 			},
 
