@@ -1,9 +1,7 @@
 import { BoidActor } from './actor.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
+
 
 /**
  * Responsible for interacting with the canvas element to draw objects on it.
@@ -29,14 +27,6 @@ export class Painter {
 
 		// Register camera
 		this.camera = camera;
-
-		// Post processing
-		this.composer = new EffectComposer( this.renderer );
-		this.composer.addPass( new RenderPass( this.scene, this.camera.threeCamera ) );
-
-		// const afterimagePass = new AfterimagePass();
-		// afterimagePass.uniforms['damp'] = 0.99
-		// this.composer.addPass( afterimagePass );
 
 	}
 
@@ -123,7 +113,7 @@ export class Painter {
 		})
 
 		// Render a new frame
-		this.composer.render(this.scene, this.camera.threeCamera);
+		this.renderer.render(this.scene, this.camera.threeCamera);
 	}
 }
 

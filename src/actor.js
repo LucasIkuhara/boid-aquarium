@@ -94,8 +94,8 @@ export class BoidActor {
     }
 
     static resetBoidSim() {
-        this.constructor.boidCount = 0;
-        this.constructor.peers = [];
+        this.boidCount = 0;
+        this.peers = [];
     }
 
     /**
