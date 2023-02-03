@@ -35,7 +35,7 @@ export default {
 				tooClose: 1.1,
 				tooFar: 1.6,
 				randomness: 0.02,
-				turnSpeed: 150,
+				turnSpeed: 0.25,
 				boidSpeed: 5
 			},
 
