@@ -1,5 +1,9 @@
 # Boid Aquarium
 
+## Try it live!
+
+There is a working demo you can check out right now at https://lucasikuhara.github.io/boid-aquarium/
+
 ## What are Boids?
 
 The general idea of Boids is simulating flocking behavior (aka organized group movement) in individuals with no central planning.
