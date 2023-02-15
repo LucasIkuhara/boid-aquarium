@@ -26,17 +26,17 @@ const vec3 = glMatrix.vec3;
  */
 export function applyNoiseToVec3(x, scale, normalize=true) {
 
-    // Add noise
-    let noisyVec = vec3.add([], 
-        x, 
-        vec3.random([], scale)
-    )
+	// Add noise
+	let noisyVec = vec3.add([], 
+		x, 
+		vec3.random([], scale)
+	);
 
-    // Transform to a unit-vector
-    if (normalize)
-        noisyVec = vec3.normalize([], noisyVec);
+	// Transform to a unit-vector
+	if (normalize)
+		noisyVec = vec3.normalize([], noisyVec);
 
-    return noisyVec;
+	return noisyVec;
 }
 
 /**
@@ -51,16 +51,16 @@ export function applyNoiseToVec3(x, scale, normalize=true) {
  */
 export function applyNoiseToAxisAngle(x, scale, normalize=true) {
 
-    const newAxis = applyNoiseToVec3(x.axis, scale, normalize);
-    let newAngle = x.angle + random(scale*2*Math.PI);
+	const newAxis = applyNoiseToVec3(x.axis, scale, normalize);
+	let newAngle = x.angle + random(scale*2*Math.PI);
 
-    if (normalize)
-        newAngle = newAngle % (2 * Math.PI);
+	if (normalize)
+		newAngle = newAngle % (2 * Math.PI);
 
-    return {
-        axis: newAxis,
-        angle: newAngle
-    }
+	return {
+		axis: newAxis,
+		angle: newAngle
+	};
 }
 
 /**
@@ -72,12 +72,12 @@ export function applyNoiseToAxisAngle(x, scale, normalize=true) {
  */
 export function lerp(a, b, factor) {
 
-    // make sure the factor is between 0 and 1.
-    factor = Math.min(1, factor)
-    factor = Math.max(0, factor)
+	// make sure the factor is between 0 and 1.
+	factor = Math.min(1, factor);
+	factor = Math.max(0, factor);
 
-    const value = (1-factor)*a + factor*b;
-    return value
+	const value = (1-factor)*a + factor*b;
+	return value;
 }
 
 /**
@@ -86,7 +86,7 @@ export function lerp(a, b, factor) {
  * @returns A random number.
 */
 export function random(scale) {
-    return ((Math.random()*2)-1)*scale;
+	return ((Math.random()*2)-1)*scale;
 }
 
 /**
@@ -96,11 +96,11 @@ export function random(scale) {
  */
 export async function isolated(fn) {
 
-    if (sessionStorage.getItem('isolated-lock') === 'true') return;
+	if (sessionStorage.getItem("isolated-lock") === "true") return;
 
-    sessionStorage.setItem('isolated-lock', true)
-    const result = await fn();
-    sessionStorage.setItem('isolated-lock', false)
+	sessionStorage.setItem("isolated-lock", true);
+	const result = await fn();
+	sessionStorage.setItem("isolated-lock", false);
 
-    return result
+	return result;
 }

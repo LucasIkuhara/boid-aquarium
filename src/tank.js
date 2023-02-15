@@ -1,5 +1,4 @@
-import { Painter } from "./painter.js"
-import { BlinkingActor, BoidActor } from "./actor.js"
+import { BlinkingActor, BoidActor } from "./actor.js";
 
 
 /**
@@ -15,7 +14,7 @@ import { BlinkingActor, BoidActor } from "./actor.js"
 
 export class BoidTank {
 
-    /**
+	/**
      * Creates a new BoidTank.
      * @constructor
      * @param {Painter} painter A Painter object.
@@ -24,40 +23,40 @@ export class BoidTank {
      * @param {import('./actor').BlinkCfg} blinkCfg The parameters for blinking boid creation.
      * @param {boolean} debug Enable debugging logs.
      */
-    constructor(painter, env, cfg, blinkCfg, debug=false) {
+	constructor(painter, env, cfg, blinkCfg, debug=false) {
 
-        this.env = env;
-        this.painter = painter;
-        this.frame = 0;
-        this.debug = debug;
+		this.env = env;
+		this.painter = painter;
+		this.frame = 0;
+		this.debug = debug;
 
-        this.boids = []
-        for (let i=0; i<env.boidCountTarget; i++) {
-            this.boids.push(
-                env.useBlinking ?
-                new BlinkingActor(env, cfg, blinkCfg) :
-                new BoidActor(env, cfg)
-            )
-        }
-    }
+		this.boids = [];
+		for (let i=0; i<env.boidCountTarget; i++) {
+			this.boids.push(
+				env.useBlinking ?
+					new BlinkingActor(env, cfg, blinkCfg) :
+					new BoidActor(env, cfg)
+			);
+		}
+	}
 
-    /**
+	/**
      * Trigger all boids to compute a new state.
      */
-    triggerAll() {
-        this.boids.forEach(boid => boid.act());
-    }
+	triggerAll() {
+		this.boids.forEach(boid => boid.act());
+	}
 
-    /**
+	/**
      * Advance time in the tank simulation.
      */
-    simStep() {
+	simStep() {
 
-        if (this.debug) {
-            this.frame++;
-            console.log("[FRAME]:", this.frame)
-        }
-        this.triggerAll();
-        this.painter.paintScene(this.boids, this.env)
-    }
+		if (this.debug) {
+			this.frame++;
+			console.log("[FRAME]:", this.frame);
+		}
+		this.triggerAll();
+		this.painter.paintScene(this.boids, this.env);
+	}
 }
