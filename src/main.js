@@ -4,9 +4,10 @@ import { CameraController } from "./camera.js";
 import SettingsMenu from "./menu/menu.js";
 import { resetBoids } from "./actor.js";
 import { isolated } from "./utils.js";
+import { createApp } from "Vue";
 
 
-Vue.createApp({
+createApp({
 	data() {
 		return {
 			canvasHeight: window.innerHeight,
