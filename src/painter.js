@@ -1,6 +1,5 @@
-import { BoidActor } from './actor.js';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 
 /**
@@ -20,9 +19,9 @@ export class Painter {
 		// Setup THREE.js
 		const canvas = document.querySelector(`#${canvasElementId}`);
 		this.renderer = new THREE.WebGLRenderer({canvas});
-		this.renderer.setClearAlpha(0)
+		this.renderer.setClearAlpha(0);
 
-		this.scene = new THREE.Scene()
+		this.scene = new THREE.Scene();
 		this.isSceneReady = false;
 
 		// Register camera
@@ -37,12 +36,12 @@ export class Painter {
 
 		try{
 			const loader = new GLTFLoader();
-			const model = await loader.loadAsync('./models/boid_fish.glb');
+			const model = await loader.loadAsync("./models/boid_fish.glb");
 			this.boidModel = model.scene.children[0].geometry;
 		} 
 
 		catch(error) {
-			throw Error(`Failed to load Boid model: ${error}`)
+			throw Error(`Failed to load Boid model: ${error}`);
 		}
 	}
 
@@ -85,7 +84,7 @@ export class Painter {
 		this.scene.add(new THREE.Mesh(
 			new THREE.BoxGeometry(...env.tankSize.map(n => (n + wallOffset)*2)),
 			new THREE.MeshBasicMaterial({color: 0x44aa88, wireframe: true})
-		))
+		));
 
 		this.isSceneReady = true;
 	}
@@ -107,10 +106,10 @@ export class Painter {
 			// Update colors in case of flashing boids
 			let emission = actor.emission;
 			if (emission) {
-				obj.material.emissive = emission.color
-				obj.material.emissiveIntensity = emission.intensity
+				obj.material.emissive = emission.color;
+				obj.material.emissiveIntensity = emission.intensity;
 			}
-		})
+		});
 
 		// Render a new frame
 		this.renderer.render(this.scene, this.camera.threeCamera);
@@ -156,7 +155,7 @@ function actorToModel(actor) {
 
 	// Set scale
 	const scale = 1.0;
-	matrix.scale(new THREE.Vector3(scale, scale, scale))
+	matrix.scale(new THREE.Vector3(scale, scale, scale));
 
 	return matrix;
 }

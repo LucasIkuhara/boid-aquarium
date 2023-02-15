@@ -1,0 +1,18 @@
+{
+  "name": "boid-aquarium",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasIkuhara/boid-aquarium.git"
+  },
+  "author": "Lucas Ikuhara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LucasIkuhara/boid-aquarium/issues"
+  },
+  "homepage": "https://github.com/LucasIkuhara/boid-aquarium#readme",
+  "devDependencies": {
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0"
+  }
+}

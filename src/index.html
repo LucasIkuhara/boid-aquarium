@@ -2,23 +2,23 @@
 <html class="fill">
 
     <head>
-        <meta charset=utf-8>
-        <script src="https://unpkg.com/vue@3"></script>
-        <script src="https://unpkg.com/vue-router@4"></script>
-        <script language="javascript" src="https://npmcdn.com/regl/dist/regl.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/3.4.2/gl-matrix-min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-        <script type="importmap">
-            {
-              "imports": {
-                "three": "https://unpkg.com/three@0.148.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.148.0/examples/jsm/"
-              }
-            }
-          </script>
-        <link rel="stylesheet" href="style.css">
+		<meta charset=utf-8>
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three@0.148.0/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@0.148.0/examples/jsm/"
+			}
+		}
+		</script>
+		<script src="https://unpkg.com/vue@3"></script>
+		<script src="https://unpkg.com/vue-router@4"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/3.4.2/gl-matrix-min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+		<link rel="stylesheet" href="style.css">
     </head>
-    
+
     <body class="fill">
         <!-- Vue App -->
         <div id="vue-app" class="fill">
@@ -29,7 +29,6 @@
             <canvas id="webgl-canvas" v-bind:height="canvasHeight" v-bind:width="canvasWidth" class="fill"></canvas>
 
         </div>
-        
     </body>
     <script src="main.js" type="module"></script>
 

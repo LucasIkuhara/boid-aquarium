@@ -1,6 +1,6 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 const vec3 = glMatrix.vec3;
-import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
+import { random, applyNoiseToAxisAngle } from "./utils.js";
 
 /** Type imports 
  * @typedef {import('./utils').AxisAngle} AxisAngle
@@ -48,175 +48,175 @@ import { random, applyNoiseToAxisAngle, lerp } from './utils.js';
  */
 export class BoidActor {
 
-    // Keep state of all boids accessible
-    static boidCount = 0;
-    static peers = [];
+	// Keep state of all boids accessible
+	static boidCount = 0;
+	static peers = [];
 
-    /**
+	/**
      * Creates a new BoidActor.
      * @constructor
      * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
      * @param {BoidCfg} config The parameters for boid decision-making.
      */
-    constructor(environment, config) {
+	constructor(environment, config) {
 
-        // Behavior parameters
-        this.env = environment;
-        this.cfg = config;
+		// Behavior parameters
+		this.env = environment;
+		this.cfg = config;
 
-        // Generate Boid ID and add to peers
-        this.constructor.boidCount++;
-        this._id = this.constructor.boidCount;
-        this.constructor.peers.push(this);
-        this.visiblePeers = [];
+		// Generate Boid ID and add to peers
+		this.constructor.boidCount++;
+		this._id = this.constructor.boidCount;
+		this.constructor.peers.push(this);
+		this.visiblePeers = [];
 
-        // ! refactor
-        this.position = [
-            random(this.env.tankSize[0]), 
-            random(this.env.tankSize[1]), 
-            this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
-        ]
+		// ! refactor
+		this.position = [
+			random(this.env.tankSize[0]), 
+			random(this.env.tankSize[1]), 
+			this.env.is2dSpace ? 0 : random(this.env.tankSize[2])
+		];
 
-        /**
+		/**
          * @type {AxisAngle}
          * Start with a random orientation
          * Uses Axis-angle representation.
          */
-        this.orientation = {
-            axis: [
-                random(0.5), 
-                random(0.5), 
-                this.env.is2dSpace ? 0 : random(0.5)
-            ],
-            angle: random(2*Math.PI)
-        }
+		this.orientation = {
+			axis: [
+				random(0.5), 
+				random(0.5), 
+				this.env.is2dSpace ? 0 : random(0.5)
+			],
+			angle: random(2*Math.PI)
+		};
 
-    }
+	}
 
-    static resetBoidSim() {
-        this.boidCount = 0;
-        this.peers = [];
-    }
+	static resetBoidSim() {
+		this.boidCount = 0;
+		this.peers = [];
+	}
 
-    /**
+	/**
      * Computes the next step in the boid simulation. Updates the object's position and heading.
      */
-    act() {
-        this.visiblePeers = this.getVisiblePeers();
-        const orientation = this.computeOrientation();
-        this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
-        this.position = this.computePosition();
-    }
+	act() {
+		this.visiblePeers = this.getVisiblePeers();
+		const orientation = this.computeOrientation();
+		this.orientation = applyNoiseToAxisAngle(orientation, this.cfg.randomness);
+		this.position = this.computePosition();
+	}
 
-    /**
+	/**
      * Computes the new boid position based on its current position, heading and speed.
      * @returns The new position as a number[] of size 3.
      */
-    computePosition() {
+	computePosition() {
 
-        // Factor accounting for time step and speed
-        const moveBy = this.cfg.boidSpeed * this.env.timeStepInSecs;
+		// Factor accounting for time step and speed
+		const moveBy = this.cfg.boidSpeed * this.env.timeStepInSecs;
 
-        // Compute movement vector and new position
-        const displacementVector = vec3.scale([], this.orientation.axis, moveBy);
-        let pos = vec3.add([], this.position, displacementVector);
+		// Compute movement vector and new position
+		const displacementVector = vec3.scale([], this.orientation.axis, moveBy);
+		let pos = vec3.add([], this.position, displacementVector);
 
-        // Make the boids bounce back, in case they are escaping the tank
-        pos.forEach((val, index) => {
+		// Make the boids bounce back, in case they are escaping the tank
+		pos.forEach((val, index) => {
 
-            if (val > this.env.tankSize[index]) 
-                this.orientation.axis[index] = -Math.abs(this.orientation.axis[index]);
+			if (val > this.env.tankSize[index]) 
+				this.orientation.axis[index] = -Math.abs(this.orientation.axis[index]);
 
-            else if (val < -this.env.tankSize[index])
-                this.orientation.axis[index] = Math.abs(this.orientation.axis[index]);
+			else if (val < -this.env.tankSize[index])
+				this.orientation.axis[index] = Math.abs(this.orientation.axis[index]);
 
-        });
+		});
 
-        return pos;
-    }
+		return pos;
+	}
 
-    /**
+	/**
      * Computes a new orientation based on its peers.
      * This is the core of boid grouping behavior.
      * @returns {AxisAngle} The new orientation for that boid.
      */
-    computeOrientation() {
+	computeOrientation() {
 
-        // Get all visible neighbors. If there aren't any, keep current course.
-        if (this.visiblePeers.length < 1)  return this.orientation
+		// Get all visible neighbors. If there aren't any, keep current course.
+		if (this.visiblePeers.length < 1)  return this.orientation;
 
-        // If there are visible peers, compute new orientation based on them.
-        let newOrientation = { axis: null, angle: this.orientation.angle };
-        const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
+		// If there are visible peers, compute new orientation based on them.
+		let newOrientation = { axis: null, angle: this.orientation.angle };
+		const turnRate = this.cfg.turnSpeed * this.env.timeStepInSecs;
 
-        // Compute the average position and heading of visible peers.
-        const avg = this.constructor.averagePeers(this.visiblePeers);
+		// Compute the average position and heading of visible peers.
+		const avg = this.constructor.averagePeers(this.visiblePeers);
 
-        const boidToPeers = vec3.subtract([], avg.position, this.position);
-        const distance = vec3.len(boidToPeers);
+		const boidToPeers = vec3.subtract([], avg.position, this.position);
+		const distance = vec3.len(boidToPeers);
 
-        // Aggregation, Separation and Cohesion behaviors
-        // Move closer
-        if (distance < this.cfg.tooClose) 
-            newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.negate([], boidToPeers), turnRate);
+		// Aggregation, Separation and Cohesion behaviors
+		// Move closer
+		if (distance < this.cfg.tooClose) 
+			newOrientation.axis = vec3.lerp([], this.orientation.axis, vec3.negate([], boidToPeers), turnRate);
 
-        // Move farther
-        else if (distance > this.cfg.tooFar) 
-            newOrientation.axis = boidToPeers
+		// Move farther
+		else if (distance > this.cfg.tooFar) 
+			newOrientation.axis = boidToPeers;
 
-        // Move alongside
-        else {
-            newOrientation.axis = avg.orientation.axis  
-            newOrientation.angle =  avg.orientation.angle   
-        }
+		// Move alongside
+		else {
+			newOrientation.axis = avg.orientation.axis;  
+			newOrientation.angle =  avg.orientation.angle;   
+		}
 
-        return newOrientation;
-    } 
+		return newOrientation;
+	} 
 
-    /**
+	/**
      * Returns the list of boids that are in visible range of the actor, excluding itself.
      * @returns {BoidActor[]} An array of boids in range.
     */
-    getVisiblePeers() {
+	getVisiblePeers() {
 
-        return this.constructor.peers.filter(boid => {
+		return this.constructor.peers.filter(boid => {
            
-            // Exclude itself
-            if (boid._id === this._id) return false;
+			// Exclude itself
+			if (boid._id === this._id) return false;
             
-            return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
-        })
-    }
+			return vec3.distance(this.position, boid.position) < this.cfg.viewingRange;
+		});
+	}
 
-    /**
+	/**
      * Computes the average pose of a group of BoidActors.
      * @param {BoidActor[]} peers A group of boids.
      * @returns {Pose} The average position and orientation of all boids in the group.
      */
-    static averagePeers(peers) {
+	static averagePeers(peers) {
 
-        // Accumulate all headings and positions
-        let avg = peers.reduce(
-            (prev, curr) => ({
-                position: vec3.add([], prev.position, curr.position),
-                orientation: {
-                    axis: vec3.add([], prev.orientation.axis, curr.orientation.axis),
-                    angle: prev.orientation.angle + curr.orientation.angle
-                }
-            }),
-        {position: [0,0,0], orientation: {axis: [0,0,0], angle: 0}});
+		// Accumulate all headings and positions
+		let avg = peers.reduce(
+			(prev, curr) => ({
+				position: vec3.add([], prev.position, curr.position),
+				orientation: {
+					axis: vec3.add([], prev.orientation.axis, curr.orientation.axis),
+					angle: prev.orientation.angle + curr.orientation.angle
+				}
+			}),
+			{position: [0,0,0], orientation: {axis: [0,0,0], angle: 0}});
   
-        // Vector normalization
-        avg = {
-            position: vec3.scale([], avg.position, 1/peers.length),
-            orientation: {
-                axis: vec3.normalize([], avg.orientation.axis),
-                angle: avg.orientation.angle/(peers.length)
-            }
-        };
+		// Vector normalization
+		avg = {
+			position: vec3.scale([], avg.position, 1/peers.length),
+			orientation: {
+				axis: vec3.normalize([], avg.orientation.axis),
+				angle: avg.orientation.angle/(peers.length)
+			}
+		};
 
-        return avg;
-    }
+		return avg;
+	}
 }
 
 /**
@@ -226,104 +226,104 @@ export class BoidActor {
  */
 export class BlinkingActor extends BoidActor {
 
-    /**
+	/**
      * Creates a new BlinkingActor.
      * @constructor
      * @param {import('./tank.js').EnvConfig} environment The settings of the environment the boid is in.
      * @param {BoidCfg} config The parameters for boid decision-making.
      * @param {BlinkCfg} blinkCfg The parameters for boid blinking behavior.
      */
-    constructor(environment, config, blinkCfg) {
-        super(environment, config);
+	constructor(environment, config, blinkCfg) {
+		super(environment, config);
 
-        this.blinkCfg = blinkCfg;
-        this.phase = Math.random()*360;
-        this.excitement = Math.random();
-    }
+		this.blinkCfg = blinkCfg;
+		this.phase = Math.random()*360;
+		this.excitement = Math.random();
+	}
 
-    /**
+	/**
      * Compute the normal behavior of a @type {BoidActor}, with some additional
      * distributed color matching logic. Boids should sync their color and blink timings
      * by observing others. Seeing a peer blink (or change colors) increases the urge of
      * a @type {BlinkingBoid} to do so, generating the emergent behavior of synchrony.
      */
-    act() {
-        super.act();
-        this.excitement = this.computeExcitement();
-        this.phase = this.computeColorPhase();
-    }
+	act() {
+		super.act();
+		this.excitement = this.computeExcitement();
+		this.phase = this.computeColorPhase();
+	}
 
-    /**
+	/**
      * Computes the color of the boid's light emissions based on time passage and peers.
      * The phase increases with time and also upon seeing other boids reset their phase (ie. seeing a boid
      * with a phase value critically close to 360, with the definition of criticality depending on the 
      * colorEmpathyFactor). If the phase exceeds 360, it will be reset in the next simulation step.
      * @returns {number} The degree component of an HSL color.
      */
-    computeColorPhase() {
+	computeColorPhase() {
 
-        // If the boid just blinked, reset gradient
-        if (this.phase > 360) return 0;
+		// If the boid just blinked, reset gradient
+		if (this.phase > 360) return 0;
 
-        // Passive isolated color change
-        let phase = this.phase + this.env.timeStepInSecs * this.blinkCfg.colorAccumulationRate;
+		// Passive isolated color change
+		let phase = this.phase + this.env.timeStepInSecs * this.blinkCfg.colorAccumulationRate;
 
-        // Empathetic color change
-        this.visiblePeers.forEach(peer => {
-            if (peer.phase > 360 - this.blinkCfg.colorEmpathyFactor) 
-                phase = phase + this.blinkCfg.colorEmpathyFactor;
-        })
+		// Empathetic color change
+		this.visiblePeers.forEach(peer => {
+			if (peer.phase > 360 - this.blinkCfg.colorEmpathyFactor) 
+				phase = phase + this.blinkCfg.colorEmpathyFactor;
+		});
 
-        return phase;
-    }
+		return phase;
+	}
 
-    /**
+	/**
      * Calculate the excitement gradient of the boid, which controls blinking.
      * The boid's excitement is visible to peers once the gradient is critically close to 1
      * (less than the value of empathyFactor away). If the gradient exceeds 1, it will reset
      * next step.
      * @returns {number} The new excitement gradient value based on time passage and peers.
      */
-    computeExcitement() {
+	computeExcitement() {
 
-        // If the boid just blinked, reset gradient
-        if (this.excitement > 1) return 0;
+		// If the boid just blinked, reset gradient
+		if (this.excitement > 1) return 0;
 
-        // Passive isolated excitement growth
-        let excitement = this.excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
+		// Passive isolated excitement growth
+		let excitement = this.excitement + this.env.timeStepInSecs * this.blinkCfg.accumulationRate;
 
-        // Empathetic excitement growth
-        this.visiblePeers.forEach(peer => {
-            if (peer.excitement > 1 - this.blinkCfg.empathyFactor) 
-                excitement += this.blinkCfg.empathyFactor;
-        })
+		// Empathetic excitement growth
+		this.visiblePeers.forEach(peer => {
+			if (peer.excitement > 1 - this.blinkCfg.empathyFactor) 
+				excitement += this.blinkCfg.empathyFactor;
+		});
 
-        return excitement;
-    }
+		return excitement;
+	}
 
-    /**
+	/**
      * The parameters of light emission from the blinking boid.
      */
-    get emission() {
-        return {
-            color: new THREE.Color(`hsl(${this.phase}, ${this.blinkCfg.colorSaturation}%, 50%)`),
-            intensity: this.computeIntensity()
-        }
-    }
+	get emission() {
+		return {
+			color: new THREE.Color(`hsl(${this.phase}, ${this.blinkCfg.colorSaturation}%, 50%)`),
+			intensity: this.computeIntensity()
+		};
+	}
 
-    /**
+	/**
      * Applies a function to convert excitement into blinking brightness.
      */
-    computeIntensity() {
+	computeIntensity() {
 
-        const val = this.excitement < 0.5 ?
-        Math.pow(this.excitement + 0.5, 6) :
-        Math.pow(this.excitement - 1.5, 6)
+		const val = this.excitement < 0.5 ?
+			Math.pow(this.excitement + 0.5, 6) :
+			Math.pow(this.excitement - 1.5, 6);
 
-        // Ensure intensity is in the [minBrightness, maxBrightness] interval
-        const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);
-        return normalized;
-    }
+		// Ensure intensity is in the [minBrightness, maxBrightness] interval
+		const normalized = Math.max(Math.min(val, this.blinkCfg.maxBrightness), this.blinkCfg.minBrightness);
+		return normalized;
+	}
 }
 
 /**
@@ -331,6 +331,6 @@ export class BlinkingActor extends BoidActor {
  * to be restarted.
  */
 export function resetBoids() {
-    BoidActor.resetBoidSim();
-    BlinkingActor.resetBoidSim();
+	BoidActor.resetBoidSim();
+	BlinkingActor.resetBoidSim();
 }
