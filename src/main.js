@@ -5,6 +5,7 @@ import SettingsMenu from "./menu/menu.js";
 import { resetBoids } from "./actor.js";
 import { isolated } from "./utils.js";
 import { createApp } from "Vue";
+import feather from "feather";
 
 
 createApp({

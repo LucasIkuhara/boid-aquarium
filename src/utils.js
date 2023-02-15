@@ -1,4 +1,5 @@
-const vec3 = glMatrix.vec3;
+import { vec3 } from "glMatrix";
+
 
 /**
  * Represents an orientation using a heading vector (axis) and an angle.

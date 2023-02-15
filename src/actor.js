@@ -1,5 +1,5 @@
 import * as THREE from "three";
-const vec3 = glMatrix.vec3;
+import { vec3 } from "glMatrix";
 import { random, applyNoiseToAxisAngle } from "./utils.js";
 
 /** Type imports 
