@@ -19,7 +19,7 @@ export default {
 
 			// Environment Settings
 			env: {
-				boidCountTarget: 70,
+				boidCountTarget: 350,
 				is2dSpace: false,
 				dimensions: {
 					x: window.innerWidth/100, 
@@ -43,7 +43,7 @@ export default {
 				maxBrightness: 1.0,
 				minBrightness: 0.15,
 				accumulationRate: 0.2,
-				empathyFactor: 0.2,
+				empathyFactor: 0.5,
 				colorSaturation: 30,
 				colorAccumulationRate: 5,
 				colorEmpathyFactor: 40
